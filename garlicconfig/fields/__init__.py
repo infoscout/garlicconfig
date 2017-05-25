@@ -1,6 +1,11 @@
 from garlicconfig.exceptions import ValidationError
 
 
+def assert_value_type(value, type):
+    if not isinstance(value, type):
+        raise ValidationError("Value must be of type '{type}'".format(type=type.__name__))
+
+
 class ConfigField(object):
 
     def __init__(self, default=None, nullable=True, desc=None):
@@ -47,9 +52,8 @@ class StringField(ConfigField):
 
     def validate(self, value):
         super(StringField, self).validate(value)
-        if not isinstance(value, str):
-            raise ValidationError("Value must be of type 'str'")
-        elif self.choices and value not in self.choices:
+        assert_value_type(value, str)
+        if self.choices and value not in self.choices:
             raise ValidationError("Given value '{given}' is not accepted. Choices are '{choices}'".format(
                 given=value,
                 choices="', '".join(self.choices)
@@ -60,5 +64,11 @@ class BooleanField(ConfigField):
 
     def validate(self, value):
         super(BooleanField, self).validate(value)
-        if not isinstance(value, bool):
-            raise ValidationError("Value must be of type 'bool'")
+        assert_value_type(value, bool)
+
+
+class IntegerField(ConfigField):
+
+    def validate(self, value):
+        super(IntegerField, self).validate(value)
+        assert_value_type(value, int)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 
-from garlicconfig.fields import ConfigField, StringField, BooleanField
+from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerField
 from garlicconfig.exceptions import ValidationError
 
 
@@ -53,6 +53,12 @@ class TestConfigFields(unittest.TestCase):
             testfield.value = 'some random string'
         testfield.value = True
         self.assertEqual(testfield.value, True)
+
+    def test_int(self):
+        testfield = IntegerField(default=0, nullable=False)  # make sure we don't confuse 0 with None
+        testfield.value = -1
+        with self.assertRaises(ValidationError):
+            testfield.value = 'yomama'
 
 
 if __name__ == '__main__':
