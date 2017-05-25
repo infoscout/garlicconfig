@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 import unittest
 
-from garlicconfig.fields import ConfigField
+from garlicconfig.fields import ConfigField, StringField
 from garlicconfig.exceptions import ValidationError
 
 
 class TestConfigFields(unittest.TestCase):
 
-    def test_nullable(self):
-        # ConfigField
+    def test_base(self):
         testfield = ConfigField()
         self.assertEqual(testfield.default, None)
         self.assertEqual(testfield.nullable, True)
@@ -28,6 +27,23 @@ class TestConfigFields(unittest.TestCase):
 
         with self.assertRaises(ValidationError):
             testfield = ConfigField(default=None, nullable=False)  # can't set an invalid default value.
+
+    def test_string(self):
+        # test null and default
+        testfield = StringField(default=None, nullable=True)
+        self.assertEqual(testfield.value, None)
+        testfield.value = None  # make sure it doesn't raise
+        testfield.value = 'test string'
+        self.assertEqual(testfield.value, 'test string')
+
+        with self.assertRaises(TypeError):
+            testfield = StringField(default=None, nullable=False, choices='peyman,sth')  # invalid choices
+
+        testfield = StringField(default='value1', nullable=False, choices=('value1', 'value2',))
+        with self.assertRaises(ValidationError):
+            testfield.value = 'something'
+        testfield.value = 'value2'
+        self.assertEqual(testfield.value, 'value2')
 
 
 if __name__ == '__main__':
