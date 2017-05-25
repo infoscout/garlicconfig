@@ -1,9 +1,9 @@
 from garlicconfig.exceptions import ValidationError
 
 
-def assert_value_type(value, type):
+def assert_value_type(value, type, name):
     if not isinstance(value, type):
-        raise ValidationError("Value must be of type '{type}'".format(type=type.__name__))
+        raise ValidationError("Value for '{key}' must be of type '{type}'".format(type=type.__name__, key=name))
 
 
 class ConfigField(object):
@@ -17,28 +17,28 @@ class ConfigField(object):
             nullable (bool) : determines whether this field is permitted to have to no value at all.
             desc (str) : a short description of what this field is.
         """
+        self.name = type(self).__name__  # optional friendly name for this field. defaults to the field type's name
         self.nullable = nullable
+        self.__validate__(default)  # make sure default value is valid
         self.default = default
-        self.__validate(default)
-        self._value = default
         self.desc = desc
 
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self.__validate(value)
-        self._value = value
-
-    def __validate(self, value):
+    def __validate__(self, value):
+        """
+        Low level method for validation. Do not use this method outside of this package, it's prone to change
+        """
         if value is None and not self.nullable:
-            raise ValidationError("Value is not allowed to be null.")
+            raise ValidationError("Value for '{key}' is not allowed to be null.".format(key=self.name))
         elif value is not None:
             self.validate(value)
 
     def validate(self, value):
+        """
+        Determines whether or not the given value is valid for the current field.
+
+        Parameters:
+            value : value is guaranteed to be non-null.
+        """
         pass
 
 
@@ -52,10 +52,11 @@ class StringField(ConfigField):
 
     def validate(self, value):
         super(StringField, self).validate(value)
-        assert_value_type(value, str)
+        assert_value_type(value, str, self.name)
         if self.choices and value not in self.choices:
-            raise ValidationError("Given value '{given}' is not accepted. Choices are '{choices}'".format(
+            raise ValidationError("Value '{given}' for '{key}' is not accepted. Choices are '{choices}'".format(
                 given=value,
+                key=self.name,
                 choices="', '".join(self.choices)
             ))
 
@@ -64,11 +65,11 @@ class BooleanField(ConfigField):
 
     def validate(self, value):
         super(BooleanField, self).validate(value)
-        assert_value_type(value, bool)
+        assert_value_type(value, bool, self.name)
 
 
 class IntegerField(ConfigField):
 
     def validate(self, value):
         super(IntegerField, self).validate(value)
-        assert_value_type(value, int)
+        assert_value_type(value, int, self.name)
