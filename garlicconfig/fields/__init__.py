@@ -7,7 +7,6 @@ def assert_value_type(value, type, name):
 
 
 class ConfigField(object):
-
     def __init__(self, default=None, nullable=True, desc=None):
         """
         Base configuration model, holds most basic data about a field.
@@ -41,9 +40,22 @@ class ConfigField(object):
         """
         pass
 
+    def to_model_value(self, value):
+        """
+        Given a value from a python dictionary, return the appropriate value to store in the model
+        For example, if you have a custom class, you should use this method to initialize it.
+        """
+        return value
+
+    def to_dict_value(self, value, include_null_values):
+        """
+        Given a model value, return a basic value type to be stored in a python dictionary.
+        Note that this value must only hold basic types: list of integers is acceptable but a custom class is not.
+        """
+        return value
+
 
 class StringField(ConfigField):
-
     def __init__(self, default=None, nullable=True, desc=None, choices=None):
         if choices and not hasattr(choices, '__iter__'):
             raise TypeError("'choices' has to be a sequence of string elements.")
@@ -62,14 +74,12 @@ class StringField(ConfigField):
 
 
 class BooleanField(ConfigField):
-
     def validate(self, value):
         super(BooleanField, self).validate(value)
         assert_value_type(value, bool, self.name)
 
 
 class IntegerField(ConfigField):
-
     def validate(self, value):
         super(IntegerField, self).validate(value)
         assert_value_type(value, int, self.name)

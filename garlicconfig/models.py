@@ -36,7 +36,8 @@ class ConfigModel(object):
             return new_instance
         for key in obj:
             if key in cls.__meta__.fields:
-                setattr(new_instance, key, obj[key])
+                value = cls.__meta__.fields[key].to_model_value(obj[key])
+                setattr(new_instance, key, value)
         return new_instance
 
     def get_dict(self, include_null_values=False):
@@ -45,7 +46,7 @@ class ConfigModel(object):
             value = getattr(self, field_name)
             if value is None and not include_null_values:
                 continue
-            obj[field_name] = value
+            obj[field_name] = self.__meta__.fields[field_name].to_dict_value(value, include_null_values)
         return obj
 
     def __setattr__(self, name, value):

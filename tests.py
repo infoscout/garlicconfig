@@ -2,6 +2,7 @@
 import unittest
 
 from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerField
+from garlicconfig.fields.model import ModelField
 from garlicconfig.models import ConfigModel
 from garlicconfig.exceptions import ValidationError
 
@@ -70,6 +71,30 @@ class TestConfigFields(unittest.TestCase):
         with self.assertRaises(ValidationError):
             testfield.validate('Rick Sanchez')
 
+    def test_model(self):
+        class Test(ConfigModel):
+            name = StringField()
+
+        class WrongConfigModel(ConfigModel):
+            name = IntegerField()
+
+        class BadClass(object):
+            name = StringField()
+
+        with self.assertRaises(ValueError):
+            testfield = ModelField(model_class=str)
+
+        with self.assertRaises(ValueError):
+            testfield = ModelField(model_class=BadClass)
+
+        with self.assertRaises(TypeError):
+            testfield = ModelField(model_class=BadClass())
+
+        testfield = ModelField(model_class=Test)
+        testfield.validate(Test())
+        with self.assertRaises(ValidationError):
+            testfield.validate(WrongConfigModel())
+
 
 class TestConfigModel(unittest.TestCase):
 
@@ -120,6 +145,21 @@ class TestConfigModel(unittest.TestCase):
                     'age': '25'
                 }
             )
+
+    def test_model_field(self):
+        class BigConfig(ConfigModel):
+            info = ModelField(model_class=self.ChildModel)
+
+        test = BigConfig()
+        test.info.name = 'Ms. Butterhead'
+        test.info.working = False
+        self.assertEqual(test.get_dict(), {
+            'info': {
+                'age': 21,
+                'working': False,
+                'name': 'Ms. Butterhead'
+            }
+        })
 
 
 if __name__ == '__main__':
