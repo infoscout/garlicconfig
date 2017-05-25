@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 
-from garlicconfig.fields import ConfigField, StringField
+from garlicconfig.fields import ConfigField, StringField, BooleanField
 from garlicconfig.exceptions import ValidationError
 
 
@@ -44,6 +44,15 @@ class TestConfigFields(unittest.TestCase):
             testfield.value = 'something'
         testfield.value = 'value2'
         self.assertEqual(testfield.value, 'value2')
+
+    def test_bool(self):
+        testfield = BooleanField(default=False, nullable=False)
+        with self.assertRaises(ValidationError):
+            testfield.value = None
+        with self.assertRaises(ValidationError):
+            testfield.value = 'some random string'
+        testfield.value = True
+        self.assertEqual(testfield.value, True)
 
 
 if __name__ == '__main__':

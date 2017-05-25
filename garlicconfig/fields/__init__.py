@@ -54,3 +54,11 @@ class StringField(ConfigField):
                 given=value,
                 choices="', '".join(self.choices)
             ))
+
+
+class BooleanField(ConfigField):
+
+    def validate(self, value):
+        super(BooleanField, self).validate(value)
+        if not isinstance(value, bool):
+            raise ValidationError("Value must be of type 'bool'")
