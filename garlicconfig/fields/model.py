@@ -1,5 +1,6 @@
 from . import ConfigField, assert_value_type
 from garlicconfig.models import ConfigModel
+from garlicconfig.exceptions import ValidationError
 
 
 class ModelField(ConfigField):
@@ -21,5 +22,5 @@ class ModelField(ConfigField):
 
     def to_model_value(self, value):
         if not isinstance(value, dict):
-            raise TypeError("Value for {key} must be a python dict.".format(key=self.name))
+            raise ValidationError("Value for {key} must be a python dict.".format(key=self.name))
         return self.model_class.load_dict(value)

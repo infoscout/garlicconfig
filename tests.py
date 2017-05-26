@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 
-from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerField
+from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerField, ArrayField
 from garlicconfig.fields.model import ModelField
 from garlicconfig.models import ConfigModel
 from garlicconfig.exceptions import ValidationError
@@ -95,6 +95,27 @@ class TestConfigFields(unittest.TestCase):
         with self.assertRaises(ValidationError):
             testfield.validate(WrongConfigModel())
 
+        testmodel = testfield.to_model_value({'name': 'Mark Rothko'})
+        self.assertEqual(testmodel.name, 'Mark Rothko')
+
+    def test_array(self):
+        class Test(ConfigModel):
+            age = IntegerField()
+
+        testfield = ArrayField(field=ModelField(model_class=Test), default=[])
+        testfield.validate([])
+        with self.assertRaises(ValidationError):
+            testfield.validate([1, 2, 3])
+        with self.assertRaises(ValidationError):
+            testfield.validate(['1', '2'])
+        testfield.validate([Test(), Test()])
+
+        testmodel = testfield.to_model_value([{'age': 1}, {'age': 2}])
+        self.assertEqual(testmodel[0].age, 1)
+        self.assertEqual(testmodel[1].age, 2)
+        with self.assertRaises(ValidationError):
+            testmodel = testfield.to_model_value('peyman')
+
 
 class TestConfigModel(unittest.TestCase):
 
@@ -160,6 +181,27 @@ class TestConfigModel(unittest.TestCase):
                 'name': 'Ms. Butterhead'
             }
         })
+
+        test = BigConfig.load_dict({
+            'info': {
+                'age': 21,
+                'working': False,
+                'name': 'Ms. Butterhead'
+            }
+        })
+        self.assertEqual(test.info.age, 21)
+        self.assertEqual(test.info.working, False)
+        self.assertEqual(test.info.name, 'Ms. Butterhead')
+        self.assertEqual(test.info.occupation, None)
+
+        with self.assertRaises(ValidationError):
+            test = BigConfig.load_dict({
+                'info': {
+                    'age': '21',  # make sure we properly raise ValidationError
+                    'working': False,
+                    'name': 'Ms. Butterhead'
+                }
+            })
 
 
 if __name__ == '__main__':
