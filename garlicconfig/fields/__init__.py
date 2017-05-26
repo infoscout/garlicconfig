@@ -83,3 +83,23 @@ class IntegerField(ConfigField):
     def validate(self, value):
         super(IntegerField, self).validate(value)
         assert_value_type(value, int, self.name)
+
+
+class ArrayField(ConfigField):
+    def __init__(self, field, default=None, nullable=True, desc=None):
+        if not isinstance(field, ConfigField):
+            raise TypeError("'field' has to be a ConfigField.")
+        self.field = field
+        super(ArrayField, self).__init__(default, nullable, desc)
+
+    def validate(self, value):
+        super(ArrayField, self).validate(value)
+        assert_value_type(value, list, self.name)
+        for item in value:
+            self.field.validate(item)
+
+    def to_model_value(self, value):
+        return map(lambda x: self.field.to_model_value(x), value)
+
+    def to_dict_value(self, value, include_null_values):
+        return map(lambda x: self.field.to_dict_value(x, include_null_values), value)
