@@ -167,6 +167,11 @@ class TestConfigModel(unittest.TestCase):
                 }
             )
 
+        with self.assertRaises(ValidationError):
+            test = self.ChildModel.load_dict({  # should raise ValidationError because age and working are not provided.
+                'occupation': 'peyman'
+            })
+
     def test_model_field(self):
         class BigConfig(ConfigModel):
             info = ModelField(model_class=self.ChildModel)

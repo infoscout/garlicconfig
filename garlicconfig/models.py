@@ -1,4 +1,5 @@
 from garlicconfig.fields import ConfigField
+from garlicconfig.exceptions import ValidationError
 
 
 class ModelMetaInfo(object):
@@ -34,10 +35,13 @@ class ConfigModel(object):
         new_instance = cls()
         if not obj:
             return new_instance
-        for key in obj:
-            if key in cls.__meta__.fields:
-                value = cls.__meta__.fields[key].to_model_value(obj[key])
-                setattr(new_instance, key, value)
+        for field_name in cls.__meta__.fields:
+            field = cls.__meta__.fields[field_name]
+            if field_name in obj:
+                value = field.to_model_value(obj[field_name])
+                setattr(new_instance, field_name, value)
+            elif not field.nullable:
+                raise ValidationError("Value for '{key}' cannot be null.".format(key=field_name))
         return new_instance
 
     def get_dict(self, include_null_values=False):
