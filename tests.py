@@ -71,6 +71,20 @@ class TestConfigFields(unittest.TestCase):
         with self.assertRaises(ValidationError):
             testfield.validate('Rick Sanchez')
 
+        with self.assertRaises(TypeError):
+            testfield = IntegerField(range='peyman')
+
+        testfield = IntegerField(domain=(1, 100))
+        testfield.validate(1)  # inclusive lower bound
+        testfield.validate(50)
+        testfield.validate(100)  # inclusive upper bound
+
+        with self.assertRaises(ValidationError):
+            testfield.validate(-1)
+
+        with self.assertRaises(ValidationError):
+            testfield.validate(101)
+
     def test_model(self):
         class Test(ConfigModel):
             name = StringField()

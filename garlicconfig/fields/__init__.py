@@ -80,9 +80,23 @@ class BooleanField(ConfigField):
 
 
 class IntegerField(ConfigField):
+    def __init__(self, domain=None, default=None, nullable=True, desc=None):
+        if domain and (not isinstance(domain, tuple) or len(domain) != 2):
+            raise TypeError("'domain' has to be a tuple providing inclusive domain like: (min,max)")
+        self.domain = domain
+        super(IntegerField, self).__init__(default, nullable, desc)
+
     def validate(self, value):
         super(IntegerField, self).validate(value)
         assert_value_type(value, int, self.name)
+        if self.domain and not (self.domain[0] <= value <= self.domain[1]):
+            raise ValidationError(
+                "Value '{value}' for '{key}' has to be in range {domain}.".format(
+                    value=value,
+                    key=self.name,
+                    domain=self.domain
+                )
+            )
 
 
 class ArrayField(ConfigField):
