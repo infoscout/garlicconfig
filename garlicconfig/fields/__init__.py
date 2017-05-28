@@ -47,7 +47,7 @@ class ConfigField(object):
         """
         return value
 
-    def to_dict_value(self, value, include_null_values):
+    def to_dict_value(self, value):
         """
         Given a model value, return a basic value type to be stored in a python dictionary.
         Note that this value must only hold basic types: list of integers is acceptable but a custom class is not.
@@ -113,7 +113,7 @@ class ArrayField(ConfigField):
             self.field.validate(item)
 
     def to_model_value(self, value):
-        return map(lambda x: self.field.to_model_value(x), value)
+        return map(lambda x: self.field.to_model_value(x), value) if value else None
 
-    def to_dict_value(self, value, include_null_values):
-        return map(lambda x: self.field.to_dict_value(x, include_null_values), value)
+    def to_dict_value(self, value):
+        return map(lambda x: self.field.to_dict_value(x), value) if value else None

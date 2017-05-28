@@ -17,17 +17,13 @@ class ModelField(ConfigField):
         super(ModelField, self).validate(value)
         assert_value_type(value, self.model_class, self.name)
 
-    def to_dict_value(self, value, include_null_values):
-        if value in ({}, None):  # empty or None
-            return
-        result = value.get_dict(include_null_values)
-        if not result:
-            return
-        return result
+    def to_dict_value(self, value):
+        dict_data = value.get_dict() if value else None
+        return dict_data if dict_data else None  # if data is empty, return None
 
     def to_model_value(self, value):
         if not value:
-            return
+            return self.model_class()  # initialize a new instance
         if not isinstance(value, dict):
             raise ValidationError("Value for {key} must be a python dict.".format(key=self.name))
         return self.model_class.load_dict(value)

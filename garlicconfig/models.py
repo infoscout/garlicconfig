@@ -44,13 +44,14 @@ class ConfigModel(object):
                 raise ValidationError("Value for '{key}' cannot be null.".format(key=field_name))
         return new_instance
 
-    def get_dict(self, include_null_values=False):
+    def get_dict(self):
         obj = {}
         for field_name in self.__meta__.fields:
-            value = getattr(self, field_name)
-            if value is None and not include_null_values:
+            model_value = getattr(self, field_name)
+            dict_value = self.__meta__.fields[field_name].to_dict_value(model_value)
+            if dict_value is None:
                 continue
-            obj[field_name] = self.__meta__.fields[field_name].to_dict_value(value, include_null_values)
+            obj[field_name] = dict_value
         return obj
 
     def __setattr__(self, name, value):

@@ -159,10 +159,6 @@ class TestConfigModel(unittest.TestCase):
         test = self.ChildModel()
         test.age = 12
         self.assertEqual(test.get_dict(), {'age': 12, 'working': True})
-        self.assertEqual(
-            test.get_dict(include_null_values=True),
-            {'age': 12, 'working': True, 'name': None, 'occupation': None}
-        )
 
         test = self.ChildModel.load_dict(
             {
