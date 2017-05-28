@@ -18,9 +18,16 @@ class ModelField(ConfigField):
         assert_value_type(value, self.model_class, self.name)
 
     def to_dict_value(self, value, include_null_values):
-        return value.get_dict(include_null_values)
+        if value in ({}, None):  # empty or None
+            return
+        result = value.get_dict(include_null_values)
+        if not result:
+            return
+        return result
 
     def to_model_value(self, value):
+        if not value:
+            return
         if not isinstance(value, dict):
             raise ValidationError("Value for {key} must be a python dict.".format(key=self.name))
         return self.model_class.load_dict(value)

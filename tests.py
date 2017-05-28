@@ -111,6 +111,10 @@ class TestConfigFields(unittest.TestCase):
 
         testmodel = testfield.to_model_value({'name': 'Mark Rothko'})
         self.assertEqual(testmodel.name, 'Mark Rothko')
+        testmodel = testfield.to_model_value({})
+        testmodel = testfield.to_model_value(None)
+        self.assertEqual(testfield.to_dict_value(None, False), None)
+        self.assertEqual(testfield.to_dict_value(testmodel, False), None)
 
     def test_array(self):
         class Test(ConfigModel):
