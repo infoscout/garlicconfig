@@ -33,11 +33,9 @@ class ConfigModel(object):
     @classmethod
     def load_dict(cls, obj):
         new_instance = cls()
-        if not obj:
-            return new_instance
         for field_name in cls.__meta__.fields:
             field = cls.__meta__.fields[field_name]
-            if field_name in obj:
+            if obj and field_name in obj:
                 value = field.to_model_value(obj[field_name])
                 setattr(new_instance, field_name, value)
             elif not field.nullable:

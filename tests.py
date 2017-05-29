@@ -85,6 +85,9 @@ class TestConfigFields(unittest.TestCase):
         with self.assertRaises(ValidationError):
             testfield.validate(101)
 
+        with self.assertRaises(TypeError):
+            testfield = IntegerField(domain=12)
+
     def test_model(self):
         class Test(ConfigModel):
             name = StringField()
@@ -113,8 +116,8 @@ class TestConfigFields(unittest.TestCase):
         self.assertEqual(testmodel.name, 'Mark Rothko')
         testmodel = testfield.to_model_value({})
         testmodel = testfield.to_model_value(None)
-        self.assertEqual(testfield.to_dict_value(None, False), None)
-        self.assertEqual(testfield.to_dict_value(testmodel, False), None)
+        self.assertEqual(testfield.to_dict_value(None), None)
+        self.assertEqual(testfield.to_dict_value(testmodel), None)
 
     def test_array(self):
         class Test(ConfigModel):
@@ -122,6 +125,8 @@ class TestConfigFields(unittest.TestCase):
 
         testfield = ArrayField(field=ModelField(model_class=Test), default=[])
         testfield.validate([])
+        with self.assertRaises(TypeError):
+            testfield = ArrayField(field='something')
         with self.assertRaises(ValidationError):
             testfield.validate([1, 2, 3])
         with self.assertRaises(ValidationError):
@@ -134,6 +139,18 @@ class TestConfigFields(unittest.TestCase):
         with self.assertRaises(ValidationError):
             testmodel = testfield.to_model_value('peyman')
 
+        testfield = ArrayField(field=StringField(choices=('a', 'b'), nullable=True))
+        self.assertEqual(testfield.to_model_value(['a', 'b']), ['a', 'b'])
+        self.assertEqual(testfield.to_model_value(('a', 'b')), ['a', 'b'])
+        self.assertEqual(testfield.to_dict_value(['a', 'b']), ['a', 'b'])
+
+        testfield = ArrayField(field=ModelField(model_class=Test))
+        dict_value = testfield.to_dict_value([
+            Test.load_dict({'age': 12}),
+            Test.load_dict({'age': 13})
+        ])
+        self.assertEqual(dict_value, [{'age': 12}, {'age': 13}])
+
 
 class TestConfigModel(unittest.TestCase):
 
@@ -144,6 +161,9 @@ class TestConfigModel(unittest.TestCase):
     class ChildModel(ParentModel):
         working = BooleanField(default=True, nullable=False)
         occupation = StringField()
+
+    class OptionalConfig(ConfigModel):
+        name = StringField()
 
     def test_inheritance(self):
         self.assertEqual(set(self.ParentModel.__meta__.fields), set(['age', 'name']))
@@ -168,6 +188,12 @@ class TestConfigModel(unittest.TestCase):
                 'occupation': 'Head of Halloween Department'
             }
         )
+
+        # make sure we do instantiate a model object no matter what.
+        self.assertEqual(self.OptionalConfig.load_dict(None).get_dict(), self.OptionalConfig().get_dict())
+
+        with self.assertRaises(ValidationError):
+            self.assertEqual(self.ChildModel.load_dict(None).get_dict(), self.ChildModel().get_dict())
 
         self.assertEqual(test.age, 24)
         self.assertEqual(test.working, False)
