@@ -42,6 +42,13 @@ class EvenIntegerField(IntegerField):
 
 This field will use string in the saved python dictionary. However, for the materialized config model, it'll use integer. We're also raising an exception when a given value is not accepted.
 
+for example:
+
+```python
+class SomeRandomConfig(ConfigModel):
+	value = EvenIntegerField(nullable=False, default=2)
+```
+
 You can use `get_dict` method on config models to get a python dictionary with basic value types in it. This is handy to cache it in memory, or to use it for serialization.
 
 `load_dict` will create a new config model from a python dictionary.
