@@ -1,7 +1,11 @@
 machine:
   python:
     version: 2.7.12
+  post:
+    - pip install coverage
 
 test:
   override:
-    - python tests.py
+    - coverage run tests.py
+  post:
+    - bash <(curl -s https://codecov.io/bash) -t 2a289a72-91f5-4a4c-b011-fc9288666a49
