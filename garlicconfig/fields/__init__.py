@@ -1,9 +1,5 @@
 from garlicconfig.exceptions import ValidationError
-
-
-def assert_value_type(value, type, name):
-    if not isinstance(value, type):
-        raise ValidationError("Value for '{key}' must be of type '{type}'".format(type=type.__name__, key=name))
+from garlicconfig.utils import assert_value_type
 
 
 class ConfigField(object):

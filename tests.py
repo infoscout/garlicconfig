@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import copy
 import unittest
 
 from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerField, ArrayField
@@ -6,6 +7,7 @@ from garlicconfig.fields.model import ModelField
 from garlicconfig.models import ConfigModel
 from garlicconfig.exceptions import ValidationError
 from garlicconfig import encoder
+from garlicconfig.utils import merge
 
 
 class TestConfigFields(unittest.TestCase):
@@ -284,6 +286,60 @@ class TestEncoder(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             encoder.decode('{}', str)
+
+    def test_a(self):
+        base = {
+            'name': 'Peyman',
+            'age': 21,
+            'settings': {
+                'version': 1,
+                'numbers': [1, 2, 3],
+                'tokens': {
+                    'a': 'a',
+                    'b': 'b',
+                }
+            }
+        }
+        config = {
+            'name': 'Patrick',
+            'nickname': 'Peymo',
+            'settings': {
+                'addedProperty': 'addedValue',
+                'numbers': [4, 5, 6],
+                'tokens': {
+                    'c': 'c',
+                    'b': 'd'
+                },
+                'vars': {
+                    'x': 12
+                }
+            }
+        }
+
+        base_copy = copy.deepcopy(base)
+        config_copy = copy.deepcopy(config)
+
+        expected_end_result = {
+            'name': 'Patrick',
+            'age': 21,
+            'nickname': 'Peymo',
+            'settings': {
+                'addedProperty': 'addedValue',
+                'numbers': [4, 5, 6],
+                'tokens': {
+                    'a': 'a',
+                    'b': 'd',
+                    'c': 'c'
+                },
+                'version': 1,
+                'vars': {
+                    'x': 12
+                }
+            }
+        }
+        self.assertEqual(merge(base, config), expected_end_result)
+        self.assertEqual(base_copy, base)  # make sure we didn't touch base
+        self.assertEqual(config_copy, config)  # make sure we didn't touch config
 
 
 if __name__ == '__main__':
