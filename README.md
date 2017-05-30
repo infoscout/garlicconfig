@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/infoscout/garlicconfig.svg?style=svg&circle-token=cfc59c65adb4fae414d1665d74d8b520a6326444)](https://circleci.com/gh/infoscout/garlicconfig)
+[![codecov](https://codecov.io/gh/infoscout/garlicconfig/branch/master/graph/badge.svg?token=5uJ3VXkNJl)](https://codecov.io/gh/infoscout/garlicconfig)
 
 # GarlicConfig
 
