@@ -257,17 +257,22 @@ class TestEncoder(unittest.TestCase):
         name = StringField()
         age = IntegerField()
         numbers = ArrayField(IntegerField())
+        matrix = ArrayField(ArrayField(IntegerField()))
 
     def test_json(self):
         # encode
         test = self.Test()
         test.name = 'Peyman'
         test.age = 21
+        test.matrix = [[1, 2], [3, 4]]
         encoded_data = encoder.encode(test, pretty=False)
-        self.assertEqual(encoded_data, '{"age":21,"name":"Peyman"}')
+        self.assertEqual(encoded_data, '{"age":21,"matrix":[[1,2],[3,4]],"name":"Peyman"}')
 
         encoded_data = encoder.encode(test, pretty=True)
-        self.assertEqual(encoded_data, '{\n  "age": 21, \n  "name": "Peyman"\n}')
+        self.assertEqual(
+            encoded_data,
+            '{\n  "age": 21,\n  "matrix": [\n    [1, 2],\n    [3, 4]\n  ],\n  "name": "Peyman"\n}'
+        )
 
         with self.assertRaises(TypeError):
             encoder.encode('some random string')
@@ -287,7 +292,7 @@ class TestEncoder(unittest.TestCase):
         with self.assertRaises(TypeError):
             encoder.decode('{}', str)
 
-    def test_a(self):
+    def test_merge(self):
         base = {
             'name': 'Peyman',
             'age': 21,
