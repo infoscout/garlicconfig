@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/infoscout/garlicconfig.svg?style=svg&circle-token=cfc59c65adb4fae414d1665d74d8b520a6326444)](https://circleci.com/gh/infoscout/garlicconfig)
+
 # GarlicConfig
 
 GarlicConfig is a framework that makes it easy to write complex configurations with ability to validate them easily.
