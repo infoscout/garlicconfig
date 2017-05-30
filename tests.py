@@ -5,6 +5,7 @@ from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerF
 from garlicconfig.fields.model import ModelField
 from garlicconfig.models import ConfigModel
 from garlicconfig.exceptions import ValidationError
+from garlicconfig import encoder
 
 
 class TestConfigFields(unittest.TestCase):
@@ -247,6 +248,42 @@ class TestConfigModel(unittest.TestCase):
                     'name': 'Ms. Butterhead'
                 }
             })
+
+
+class TestEncoder(unittest.TestCase):
+    class Test(ConfigModel):
+        name = StringField()
+        age = IntegerField()
+        numbers = ArrayField(IntegerField())
+
+    def test_json(self):
+        # encode
+        test = self.Test()
+        test.name = 'Peyman'
+        test.age = 21
+        encoded_data = encoder.encode(test, pretty=False)
+        self.assertEqual(encoded_data, '{"age":21,"name":"Peyman"}')
+
+        encoded_data = encoder.encode(test, pretty=True)
+        self.assertEqual(encoded_data, '{\n  "age": 21, \n  "name": "Peyman"\n}')
+
+        with self.assertRaises(TypeError):
+            encoder.encode('some random string')
+
+        with self.assertRaises(TypeError):
+            encoder.encode(test, cls=str)
+
+        # decode
+        with self.assertRaises(TypeError):
+            encoder.decode('{"age":21,"name":"Peyman"}', self.Test, cls=str)
+
+        test = encoder.decode('{"age":21,"name":"Peyman","numbers":[1,2,3,4]}', self.Test)
+        self.assertEqual(test.age, 21)
+        self.assertEqual(test.name, 'Peyman')
+        self.assertEqual(test.numbers, [1, 2, 3, 4])
+
+        with self.assertRaises(TypeError):
+            encoder.decode('{}', str)
 
 
 if __name__ == '__main__':
