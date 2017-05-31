@@ -6,7 +6,7 @@ def assert_value_type(value, expected_type, name):
     if not isinstance(value, expected_type):
         raise ValidationError(
             "Expected '{expected}' for '{key}', but got '{got}'.".format(
-                expected=type.__name__,
+                expected=expected_type.__name__,
                 key=name,
                 got=type(value).__name__
             )
