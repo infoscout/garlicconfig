@@ -15,11 +15,8 @@ def assert_value_type(value, expected_type, name):
 
 def __merge(base, config):
     for key in config:
-        if isinstance(config[key], dict):
-            if key in base:
-                __merge(base[key], config[key])
-            else:
-                base[key] = config[key]
+        if isinstance(config[key], dict) and key in base:
+            __merge(base[key], config[key])
         else:
             base[key] = config[key]
     return base
