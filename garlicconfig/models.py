@@ -1,3 +1,4 @@
+import copy
 from garlicconfig.fields import ConfigField
 from garlicconfig.exceptions import ValidationError
 
@@ -31,7 +32,7 @@ class ConfigModel(object):
 
     def __init__(self, *args, **kwargs):
         for field_name in self.__meta__.fields:
-            setattr(self, field_name, self.__meta__.fields[field_name].default)
+            setattr(self, field_name, copy.deepcopy(self.__meta__.fields[field_name].default))
 
     @classmethod
     def load_dict(cls, obj):
