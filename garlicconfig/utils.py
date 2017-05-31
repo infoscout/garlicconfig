@@ -30,6 +30,8 @@ def merge(base, config):
         base: dict representation of the configuration.
         config: the configuration that will override base config.
     """
+    base = base or {}
+    config = config or {}
     assert_value_type(base, dict, 'base')
     assert_value_type(config, dict, 'config')
     return __merge(copy.deepcopy(base), config)
