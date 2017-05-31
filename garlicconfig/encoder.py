@@ -53,7 +53,7 @@ class PrettyJSONEncoder(json.JSONEncoder):
             output = []
             self.current_indent += self.indent
             self.current_indent_str = ''.join([' ' for x in range(self.current_indent)])
-            for key in obj:
+            for key in sorted(obj):
                 value = obj[key]
                 output.append(
                     self.current_indent_str + super(PrettyJSONEncoder, self).encode(key) + ': ' + self.encode(value)
