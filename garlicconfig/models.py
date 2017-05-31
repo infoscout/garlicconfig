@@ -17,10 +17,9 @@ class ModelMetaClass(type):
             if isinstance(attributes[key], ConfigField):
                 field.name = key
                 meta.fields[key] = field
-                setattr(new_class, key, field.default)
+                delattr(new_class, key)
         for base in bases:
             if isinstance(base, ModelMetaClass):
-                pass
                 meta.fields.update(base.__meta__.fields)
         setattr(new_class, '__meta__', meta)
         return new_class
@@ -29,6 +28,10 @@ class ModelMetaClass(type):
 class ConfigModel(object):
 
     __metaclass__ = ModelMetaClass
+
+    def __init__(self, *args, **kwargs):
+        for field_name in self.__meta__.fields:
+            setattr(self, field_name, self.__meta__.fields[field_name].default)
 
     @classmethod
     def load_dict(cls, obj):
