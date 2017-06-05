@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 import copy
+import os
 import unittest
+import shutil
 
 from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerField, ArrayField
 from garlicconfig.fields.model import ModelField
 from garlicconfig.models import ConfigModel
-from garlicconfig.exceptions import ValidationError
+from garlicconfig.exceptions import ValidationError, ConfigNotFound
+from garlicconfig.repositories import MemoryConfigRepository, FileConfigRepository
 from garlicconfig import encoder
 from garlicconfig.utils import merge
 
@@ -345,6 +348,41 @@ class TestEncoder(unittest.TestCase):
         self.assertEqual(merge(base, config), expected_end_result)
         self.assertEqual(base_copy, base)  # make sure we didn't touch base
         self.assertEqual(config_copy, config)  # make sure we didn't touch config
+
+
+class TestMemoryConfigRepository(unittest.TestCase):
+    def test_memory_repo(self):
+        memory_repo = MemoryConfigRepository()
+        self.assertEqual(list(memory_repo.all()), [])
+        with self.assertRaises(ConfigNotFound):
+            memory_repo.retrieve('something')
+
+        memory_repo.save('config1', 'data')
+        self.assertEqual(memory_repo.retrieve('config1'), 'data')
+
+
+class TestFileConfigRepository(unittest.TestCase):
+    TEST_DIR = 'testdata'
+
+    def setUp(self):
+        os.mkdir(self.TEST_DIR)
+
+    def test_memory_repo(self):
+        file_repo = FileConfigRepository(root_dir=self.TEST_DIR)
+        self.assertEqual(list(file_repo.all()), [])
+        with self.assertRaises(ConfigNotFound):
+            file_repo.retrieve('something')
+
+        file_repo.save('config1', 'data')
+        self.assertEqual(file_repo.retrieve('config1'), 'data')
+
+        with open(os.path.join(self.TEST_DIR, '.DS_Store'), 'w') as f:
+            f.write('something')
+
+        self.assertEqual(set(file_repo.all()), set(['config1']))
+
+    def tearDown(self):
+        shutil.rmtree(self.TEST_DIR)
 
 
 if __name__ == '__main__':
