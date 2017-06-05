@@ -9,10 +9,6 @@ class ConfigManager(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, repository, config_model):
-        self.repository = repository
-        self.config_model = config_model
-
     @abstractmethod
     def iterconfigs(self):
         """Similar to iteritems method. Iterate through all configurations, this will not cache results."""

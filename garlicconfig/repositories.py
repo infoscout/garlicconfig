@@ -2,7 +2,7 @@ import os
 import re
 from abc import abstractmethod, ABCMeta
 
-from isc_garlicconfig.exceptions import ConfigNotFound
+from garlicconfig.exceptions import ConfigNotFound
 
 
 class ConfigRepository(object):
