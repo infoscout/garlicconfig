@@ -1,6 +1,6 @@
 import os
 import re
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 
 from garlicconfig.exceptions import ConfigNotFound
 

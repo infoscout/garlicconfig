@@ -1,6 +1,8 @@
 import copy
-from garlicconfig.fields import ConfigField
+
 from garlicconfig.exceptions import ValidationError
+
+from garlicconfig.fields import ConfigField
 
 
 class ModelMetaInfo(object):
