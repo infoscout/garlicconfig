@@ -38,6 +38,9 @@ class ConfigModel(object):
 
     @classmethod
     def load_dict(cls, obj):
+        """
+        Instantiate a config model and load it using the given dictionary.
+        """
         new_instance = cls()
         for field_name in cls.__meta__.fields:
             field = cls.__meta__.fields[field_name]
@@ -49,6 +52,9 @@ class ConfigModel(object):
         return new_instance
 
     def get_dict(self):
+        """
+        Returns a python dictionary containing only basic types so it can be used for encoding.
+        """
         obj = {}
         for field_name in self.__meta__.fields:
             model_value = getattr(self, field_name)
