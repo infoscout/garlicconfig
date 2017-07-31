@@ -3,7 +3,7 @@ from garlicconfig.utils import assert_value_type
 
 
 class ConfigField(object):
-    def __init__(self, default=None, nullable=True, desc=None):
+    def __init__(self, default=None, nullable=True, desc=None, name=None):
         """
         Base configuration model, holds most basic data about a field.
 
@@ -12,11 +12,15 @@ class ConfigField(object):
             nullable (bool) : determines whether this field is permitted to have to no value at all.
             desc (str) : a short description of what this field is.
         """
-        self.name = type(self).__name__  # optional friendly name for this field. defaults to the field type's name
+        self.friendly_name = name
         self.nullable = nullable
         self.__validate__(default)  # make sure default value is valid
         self.default = default
         self.desc = desc
+
+    @property
+    def name(self):
+        return self.friendly_name or type(self).__name__
 
     def __validate__(self, value):
         """

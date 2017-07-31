@@ -18,7 +18,9 @@ class ModelMetaClass(type):
         for key in attributes:
             field = attributes[key]
             if isinstance(attributes[key], ConfigField):
-                field.name = key
+                # if a friendly name is provided, skip this step.
+                if not field.friendly_name:
+                    field.friendly_name = key
                 meta.fields[key] = field
                 delattr(new_class, key)
         for base in bases:
