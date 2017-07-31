@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 import copy
 import os
-import unittest
 import shutil
+import unittest
 
-from garlicconfig.fields import ConfigField, StringField, BooleanField, IntegerField, ArrayField
+from garlicconfig import encoder
+from garlicconfig.exceptions import ConfigNotFound, ValidationError
+from garlicconfig.fields import ArrayField, BooleanField, ConfigField, IntegerField, StringField
 from garlicconfig.fields.model import ModelField
 from garlicconfig.models import ConfigModel
-from garlicconfig.exceptions import ValidationError, ConfigNotFound
-from garlicconfig.repositories import MemoryConfigRepository, FileConfigRepository
-from garlicconfig import encoder
+
+from garlicconfig.repositories import FileConfigRepository, MemoryConfigRepository
+
 from garlicconfig.utils import merge
 
 
