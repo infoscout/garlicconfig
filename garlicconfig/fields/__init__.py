@@ -3,7 +3,9 @@ from garlicconfig.utils import assert_value_type
 
 
 class ConfigField(object):
-    def __init__(self, default=None, nullable=True, desc=None, name=None):
+    __init_args = ('name', 'nullable', 'default', 'desc',)
+
+    def __init__(self, **kwargs):
         """
         Base configuration model, holds most basic data about a field.
 
@@ -12,11 +14,16 @@ class ConfigField(object):
             nullable (bool) : determines whether this field is permitted to have to no value at all.
             desc (str) : a short description of what this field is.
         """
-        self.friendly_name = name
-        self.nullable = nullable
-        self.__validate__(default)  # make sure default value is valid
-        self.default = default
-        self.desc = desc
+        self.friendly_name = kwargs.get('name')
+        self.nullable = kwargs.get('nullable', True)
+        self.default = kwargs.get('default')
+        self.desc = kwargs.get('desc')
+        self.__validate__(self.default)  # make sure default value is valid
+
+        # it's nice to raise an excpetion when we get an unexpected argument so it's extra clear we're not handling it.
+        unrecognized_args = filter(lambda arg_name: arg_name not in self.__init_args, kwargs)
+        if unrecognized_args:
+            raise TypeError("Argument '{arg_name}' is not recognized.".format(arg_name=unrecognized_args[0]))
 
     @property
     def name(self):
@@ -54,13 +61,29 @@ class ConfigField(object):
         """
         return value
 
+    def get_field_desc_dict(self):
+        extra_obj = self.__extra_desc__() or {}
+        extra_obj.update({
+            'nullable': self.nullable,
+            'default': self.to_dict_value(self.default),
+        })
+        return {
+            'name': self.name,
+            'type': type(self).__name__,
+            'desc': self.desc,
+            'extra': extra_obj,
+        }
+
+    def __extra_desc__(self):
+        pass
+
 
 class StringField(ConfigField):
-    def __init__(self, default=None, nullable=True, desc=None, choices=None):
+    def __init__(self, choices=None, **kwargs):
         if choices and not hasattr(choices, '__iter__'):
             raise TypeError("'choices' has to be a sequence of string elements.")
         self.choices = choices
-        super(StringField, self).__init__(default, nullable, desc)
+        super(StringField, self).__init__(**kwargs)
 
     def validate(self, value):
         super(StringField, self).validate(value)
@@ -72,6 +95,12 @@ class StringField(ConfigField):
                 choices="', '".join(self.choices)
             ))
 
+    def __extra_desc__(self):
+        if self.choices:
+            return {
+                'choices': self.choices,
+            }
+
 
 class BooleanField(ConfigField):
     def validate(self, value):
@@ -80,11 +109,11 @@ class BooleanField(ConfigField):
 
 
 class IntegerField(ConfigField):
-    def __init__(self, domain=None, default=None, nullable=True, desc=None):
+    def __init__(self, domain=None, **kwargs):
         if domain and (not isinstance(domain, tuple) or len(domain) != 2):
             raise TypeError("'domain' has to be a tuple providing inclusive domain like: (min,max)")
         self.domain = domain
-        super(IntegerField, self).__init__(default, nullable, desc)
+        super(IntegerField, self).__init__(**kwargs)
 
     def validate(self, value):
         super(IntegerField, self).validate(value)
@@ -98,13 +127,19 @@ class IntegerField(ConfigField):
                 )
             )
 
+    def __extra_desc__(self):
+        if self.domain:
+            return {
+                'domain': self.domain,
+            }
+
 
 class ArrayField(ConfigField):
-    def __init__(self, field, default=None, nullable=True, desc=None):
+    def __init__(self, field, **kwargs):
         if not isinstance(field, ConfigField):
             raise TypeError("'field' has to be a ConfigField.")
         self.field = field
-        super(ArrayField, self).__init__(default, nullable, desc)
+        super(ArrayField, self).__init__(**kwargs)
 
     def validate(self, value):
         super(ArrayField, self).validate(value)
@@ -117,3 +152,8 @@ class ArrayField(ConfigField):
 
     def to_dict_value(self, value):
         return map(lambda x: self.field.to_dict_value(x), value) if value else None
+
+    def __extra_desc__(self):
+        return {
+            'element_info': self.field.get_field_desc_dict()
+        }

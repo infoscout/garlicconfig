@@ -66,6 +66,17 @@ class ConfigModel(object):
             obj[field_name] = dict_value
         return obj
 
+    @classmethod
+    def get_model_desc_dict(cls):
+        """
+        Returns a python dictionary containing description for the current model and its children.
+        """
+        obj = {}
+        for field_name in cls.__meta__.fields:
+            field = cls.__meta__.fields[field_name]
+            obj[field_name] = field.get_field_desc_dict()
+        return obj
+
     def __setattr__(self, name, value):
         if name in self.__meta__.fields:
             self.__meta__.fields[name].__validate__(value)

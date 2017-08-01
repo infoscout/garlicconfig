@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import copy
+import json
 import os
 import shutil
 import unittest
@@ -9,9 +10,7 @@ from garlicconfig.exceptions import ConfigNotFound, ValidationError
 from garlicconfig.fields import ArrayField, BooleanField, ConfigField, IntegerField, StringField
 from garlicconfig.fields.model import ModelField
 from garlicconfig.models import ConfigModel
-
 from garlicconfig.repositories import FileConfigRepository, MemoryConfigRepository
-
 from garlicconfig.utils import merge
 
 
@@ -255,6 +254,105 @@ class TestConfigModel(unittest.TestCase):
                     'name': 'Ms. Butterhead'
                 }
             })
+
+    def test_model_desc(self):
+        class KidConfig(ConfigModel):
+            name = StringField(name='First Name', nullable=False, default='Sam')
+
+        class ParentConfig(ConfigModel):
+            name = StringField(name='First Name', desc='Enter your first name', nullable=False, default='Peter')
+            status = StringField(desc='Whats your status?', choices=('Good', 'Bad', 'Indifferent'))
+            age = IntegerField(domain=(21, 150))
+            nick_names = ArrayField(StringField(), name='Nick Names', nullable=False, default=['No Nick Name'])
+            kids = ArrayField(ModelField(KidConfig))
+
+        expected_end_result = {
+            'name': {
+                'type': 'StringField',
+                'name': 'First Name',
+                'desc': 'Enter your first name',
+                'extra': {
+                    'nullable': False,
+                    'default': 'Peter',
+                }
+            },
+            'status': {
+                'type': 'StringField',
+                'name': 'status',
+                'desc': 'Whats your status?',
+                'extra': {
+                    'choices': ('Good', 'Bad', 'Indifferent',),
+                    'nullable': True,
+                    'default': None,
+                }
+            },
+            'age': {
+                'type': 'IntegerField',
+                'name': 'age',
+                'desc': None,
+                'extra': {
+                    'nullable': True,
+                    'default': None,
+                    'domain': (21, 150)
+                }
+            },
+            'nick_names': {
+                'type': 'ArrayField',
+                'name': 'Nick Names',
+                'desc': None,
+                'extra': {
+                    'nullable': False,
+                    'default': ['No Nick Name'],
+                    'element_info': {
+                        'type': 'StringField',
+                        'name': 'StringField',
+                        'desc': None,
+                        'extra': {
+                            'nullable': True,
+                            'default': None,
+                        }
+                    }
+                }
+            },
+            'kids': {
+                'type': 'ArrayField',
+                'name': 'kids',
+                'desc': None,
+                'extra': {
+                    'nullable': True,
+                    'default': None,
+                    'element_info': {
+                        'type': 'ModelField',
+                        'name': 'ModelField',
+                        'desc': None,
+                        'extra': {
+                            'nullable': True,
+                            'default': {
+                                'name': 'Sam'
+                            },
+                            'model_info': {
+                                'name': 'KidConfig',
+                                'fields': {
+                                    'name': {
+                                        'type': 'StringField',
+                                        'name': 'First Name',
+                                        'desc': None,
+                                        'extra': {
+                                            'nullable': False,
+                                            'default': 'Sam'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        expected_end_result_json = json.dumps(expected_end_result, sort_keys=True)
+        actual_result_json = json.dumps(ParentConfig.get_model_desc_dict(), sort_keys=True)
+        self.assertEqual(actual_result_json, expected_end_result_json)
 
 
 class TestEncoder(unittest.TestCase):

@@ -29,3 +29,11 @@ class ModelField(ConfigField):
         if not isinstance(value, dict):
             raise ValidationError("Value for {key} must be a python dict.".format(key=self.name))
         return self.model_class.load_dict(value)
+
+    def __extra_desc__(self):
+        return {
+            'model_info': {
+                'name': self.model_class.__name__,
+                'fields': self.model_class.get_model_desc_dict(),
+            }
+        }
