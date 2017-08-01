@@ -53,6 +53,17 @@ class ConfigModel(object):
                 raise ValidationError("Value for '{key}' cannot be null.".format(key=field_name))
         return new_instance
 
+    @classmethod
+    def get_model_desc_dict(cls):
+        """
+        Returns a python dictionary containing description for the current model and its children.
+        """
+        obj = {}
+        for field_name in cls.__meta__.fields:
+            field = cls.__meta__.fields[field_name]
+            obj[field_name] = field.get_field_desc_dict()
+        return obj
+
     def get_dict(self):
         """
         Returns a python dictionary containing only basic types so it can be used for encoding.
@@ -64,17 +75,6 @@ class ConfigModel(object):
             if dict_value is None:
                 continue
             obj[field_name] = dict_value
-        return obj
-
-    @classmethod
-    def get_model_desc_dict(cls):
-        """
-        Returns a python dictionary containing description for the current model and its children.
-        """
-        obj = {}
-        for field_name in cls.__meta__.fields:
-            field = cls.__meta__.fields[field_name]
-            obj[field_name] = field.get_field_desc_dict()
         return obj
 
     def __setattr__(self, name, value):
