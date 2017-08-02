@@ -6,14 +6,15 @@ from . import ConfigField, assert_value_type
 
 
 class ModelField(ConfigField):
-    def __init__(self, model_class, nullable=True, desc=None):
+    def __init__(self, model_class, **kwargs):
         if not isinstance(model_class, type):
             raise TypeError("'model_class' has to be a type.")
         if not issubclass(model_class, ConfigModel):
             raise ValueError("'model_class' has to implement ConfigModel")
         self.model_class = model_class
         instance = self.model_class()  # initialize an instance
-        super(ModelField, self).__init__(default=instance, nullable=nullable, desc=desc)
+        kwargs['default'] = instance
+        super(ModelField, self).__init__(**kwargs)
 
     def validate(self, value):
         super(ModelField, self).validate(value)
