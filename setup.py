@@ -21,8 +21,5 @@ setup(
     url='https://github.com/infoscout/garlicconfig',
     download_url='https://github.com/infoscout/garlicconfig/archive/{version}.tar.gz'.format(version=version),
     version=version,
-    keywords=['configs', 'settings'],
-    package_data={
-        'garlicconfig': ['VERSION', 'README.md']
-    }
+    keywords=['configs', 'settings']
 )
