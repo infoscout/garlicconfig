@@ -3,6 +3,7 @@ from garlicconfig.utils import assert_value_type
 
 
 class ConfigField(object):
+
     __init_args = ('name', 'nullable', 'default', 'desc',)
 
     def __init__(self, **kwargs):

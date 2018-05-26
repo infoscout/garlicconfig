@@ -5,6 +5,7 @@ from . import ConfigField, assert_value_type
 
 
 class ModelField(ConfigField):
+
     def __init__(self, model_class, **kwargs):
         if not isinstance(model_class, type):
             raise TypeError("'model_class' has to be a type.")
