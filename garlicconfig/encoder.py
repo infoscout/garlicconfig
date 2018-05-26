@@ -5,6 +5,7 @@ from garlicconfig.models import ConfigModel
 
 
 class ConfigEncoder(object):
+
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -66,6 +67,7 @@ class PrettyJSONEncoder(json.JSONEncoder):
 
 
 class JsonEncoder(ConfigEncoder):
+
     @staticmethod
     def json_loads_byteified(json_text):
         return JsonEncoder.__byteify(
