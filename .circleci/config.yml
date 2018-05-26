@@ -14,6 +14,7 @@ jobs:
                 command: |
                     source venv/bin/activate
                     pip install flake8
+                    pip install flake8-import-order
             - run:
                 name: Flake8 Check
                 command: |
