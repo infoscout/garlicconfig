@@ -11,8 +11,8 @@ class ModelMetaInfo(object):
 
 class ModelMetaClass(type):
 
-    def __new__(cls, name, bases, attributes):
-        new_class = super(ModelMetaClass, cls).__new__(cls, str(name), bases, attributes)
+    def __new__(mcs, name, bases, attributes):
+        new_class = super(ModelMetaClass, mcs).__new__(mcs, str(name), bases, attributes)
         meta = ModelMetaInfo()
         for key in attributes:
             field = attributes[key]
