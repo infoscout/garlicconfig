@@ -8,7 +8,9 @@ jobs:
             - checkout
             - run:
               name: Setup Virtual Environment
-              command: virtualenv venv
+              command: |
+                virtualenv venv
+                source venv/bin/activate
             - run:
                 name: Install Flake8
                 command: pip install flake8
@@ -23,7 +25,9 @@ jobs:
             - checkout
             - run:
               name: Setup Virtual Environment
-              command: virtualenv venv
+              command: |
+                virtualenv venv
+                source venv/bin/activate
             - run:
                  name: Install Coverage
                  command: pip install coverage
