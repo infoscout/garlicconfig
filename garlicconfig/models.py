@@ -33,7 +33,7 @@ class ConfigModel(object):
 
     __metaclass__ = ModelMetaClass
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         for field_name in self.__meta__.fields:
             setattr(self, field_name, copy.deepcopy(self.__meta__.fields[field_name].default))
 
