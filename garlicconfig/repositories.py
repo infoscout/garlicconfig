@@ -6,6 +6,7 @@ from garlicconfig.exceptions import ConfigNotFound
 
 
 class ConfigRepository(object):
+
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -31,6 +32,7 @@ class ConfigRepository(object):
 
 
 class FileConfigRepository(ConfigRepository):
+
     def __init__(self, root_dir):
         self.root = root_dir
 
@@ -55,6 +57,7 @@ class FileConfigRepository(ConfigRepository):
 
 
 class MemoryConfigRepository(ConfigRepository):
+
     def __init__(self):
         self.storage = {}
 
