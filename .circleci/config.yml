@@ -7,6 +7,9 @@ jobs:
         steps:
             - checkout
             - run:
+              name: Setup Virtual Environment
+              command: virtualenv venv
+            - run:
                 name: Install Flake8
                 command: pip install flake8
             - run:
@@ -18,6 +21,9 @@ jobs:
             - image: circleci/python:2.7.13
         steps:
             - checkout
+            - run:
+              name: Setup Virtual Environment
+              command: virtualenv venv
             - run:
                  name: Install Coverage
                  command: pip install coverage
