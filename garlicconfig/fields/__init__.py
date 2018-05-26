@@ -20,7 +20,7 @@ class ConfigField(object):
         self.desc = kwargs.get('desc')
         self.__validate__(self.default)  # make sure default value is valid
 
-        # it's nice to raise an excpetion when we get an unexpected argument so it's extra clear we're not handling it.
+        # it's nice to raise an exception when we get an unexpected argument so it's extra clear we're not handling it.
         unrecognized_args = filter(lambda arg_name: arg_name not in self.__init_args, kwargs)
         if unrecognized_args:
             raise TypeError("Argument '{arg_name}' is not recognized.".format(arg_name=unrecognized_args[0]))
