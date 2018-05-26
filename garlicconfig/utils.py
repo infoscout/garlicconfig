@@ -25,7 +25,7 @@ def __merge(base, config):
 
 def merge(base, config):
     """
-    Merge two configuratons.
+    Merge two configurations.
 
     Parameters:
         base: dict representation of the configuration.
