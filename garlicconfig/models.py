@@ -5,6 +5,7 @@ from garlicconfig.fields import ConfigField
 
 
 class ModelMetaInfo(object):
+
     def __init__(self):
         self.fields = {}  # map name to fields
 
