@@ -1,0 +1,35 @@
+version: 2
+
+jobs:
+    lint-checks:
+        docker:
+            - image: circleci/python:2.7.13
+        steps:
+            - checkout
+            - run:
+                name: Install Flake8
+                command: pip install flake8
+            - run:
+                name: Flake8 Check
+                command: flake8 garlicconfig
+
+    test-suite:
+        docker:
+            - image: circleci/python:2.7.13
+        steps:
+            - checkout
+            - run:
+                 name: Install Coverage
+                 command: pip install coverage
+            - run:
+                name: Run tests
+                command: |
+                    coverage run tests.py
+                    bash <(curl -s https://codecov.io/bash) -t 2a289a72-91f5-4a4c-b011-fc9288666a49
+
+workflows:
+    version: 2
+    pr-checks:
+        jobs:
+            - test-suite
+            - lint-checks
