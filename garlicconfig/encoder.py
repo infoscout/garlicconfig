@@ -5,6 +5,7 @@ from garlicconfig.models import ConfigModel
 
 
 class ConfigEncoder(object):
+
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -26,7 +27,8 @@ class PrettyJSONEncoder(json.JSONEncoder):
         self.current_indent = 0
         self.current_indent_str = ''
 
-    def __has_non_primitive(self, obj):
+    @staticmethod
+    def __has_non_primitive(obj):
         # since this is a private func, it's safe to assume obj is an iterable.
         for item in obj:
             if isinstance(item, (list, tuple, dict)):
@@ -66,6 +68,7 @@ class PrettyJSONEncoder(json.JSONEncoder):
 
 
 class JsonEncoder(ConfigEncoder):
+
     @staticmethod
     def json_loads_byteified(json_text):
         return JsonEncoder.__byteify(

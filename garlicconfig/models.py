@@ -5,14 +5,15 @@ from garlicconfig.fields import ConfigField
 
 
 class ModelMetaInfo(object):
+
     def __init__(self):
         self.fields = {}  # map name to fields
 
 
 class ModelMetaClass(type):
 
-    def __new__(cls, name, bases, attributes):
-        new_class = super(ModelMetaClass, cls).__new__(cls, str(name), bases, attributes)
+    def __new__(mcs, name, bases, attributes):
+        new_class = super(ModelMetaClass, mcs).__new__(mcs, str(name), bases, attributes)
         meta = ModelMetaInfo()
         for key in attributes:
             field = attributes[key]
@@ -33,7 +34,7 @@ class ConfigModel(object):
 
     __metaclass__ = ModelMetaClass
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         for field_name in self.__meta__.fields:
             setattr(self, field_name, copy.deepcopy(self.__meta__.fields[field_name].default))
 
