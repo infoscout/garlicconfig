@@ -1,5 +1,4 @@
 from garlicconfig.exceptions import ValidationError
-
 from garlicconfig.models import ConfigModel
 
 from . import ConfigField, assert_value_type

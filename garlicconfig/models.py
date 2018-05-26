@@ -1,7 +1,6 @@
 import copy
 
 from garlicconfig.exceptions import ValidationError
-
 from garlicconfig.fields import ConfigField
 
 
