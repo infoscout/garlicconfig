@@ -8,15 +8,17 @@ jobs:
             - checkout
             - run:
               name: Setup Virtual Environment
-              command: |
-                virtualenv venv
-                source venv/bin/activate
+              command: virtualenv venv
             - run:
                 name: Install Flake8
-                command: pip install flake8
+                command: |
+                  source venv/bin/activate
+                  pip install flake8
             - run:
                 name: Flake8 Check
-                command: flake8 garlicconfig
+                command: |
+                  flake8 garlicconfig
+                  source venv/bin/activate
 
     test-suite:
         docker:
@@ -25,15 +27,16 @@ jobs:
             - checkout
             - run:
               name: Setup Virtual Environment
-              command: |
-                virtualenv venv
-                source venv/bin/activate
+              command: virtualenv venv
             - run:
                  name: Install Coverage
-                 command: pip install coverage
+                 command: |
+                    source venv/bin/activate
+                    pip install coverage
             - run:
                 name: Run tests
                 command: |
+                    source venv/bin/activate
                     coverage run tests.py
                     bash <(curl -s https://codecov.io/bash) -t 2a289a72-91f5-4a4c-b011-fc9288666a49
 
