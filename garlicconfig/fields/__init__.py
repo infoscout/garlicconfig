@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import six
-
 from garlicconfig.exceptions import ValidationError
 from garlicconfig.utils import assert_value_type
+
+import six
 
 
 class ConfigField(object):

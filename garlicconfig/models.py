@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 import copy
 
-import six
-
 from garlicconfig.exceptions import ValidationError
 from garlicconfig.fields import ConfigField
+
+import six
 
 
 class ModelMetaInfo(object):

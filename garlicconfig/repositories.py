@@ -5,9 +5,9 @@ import os
 import re
 from abc import ABCMeta, abstractmethod
 
-import six
-
 from garlicconfig.exceptions import ConfigNotFound
+
+import six
 
 
 @six.add_metaclass(ABCMeta)

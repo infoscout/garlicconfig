@@ -4,9 +4,9 @@ from __future__ import unicode_literals
 import json
 from abc import ABCMeta, abstractmethod
 
-import six
-
 from garlicconfig.models import ConfigModel
+
+import six
 
 
 @six.add_metaclass(ABCMeta)
