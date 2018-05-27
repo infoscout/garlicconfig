@@ -96,6 +96,10 @@ class ConfigField(object):
 class StringField(ConfigField):
 
     def __init__(self, choices=None, **kwargs):
+        """
+        :param choices: If provided, value has to be one of these values.
+        :type choices: iterator
+        """
         if choices and not hasattr(choices, '__iter__'):
             raise TypeError("'choices' has to be a sequence of string elements.")
         self.choices = choices
@@ -128,6 +132,10 @@ class BooleanField(ConfigField):
 class IntegerField(ConfigField):
 
     def __init__(self, domain=None, **kwargs):
+        """
+        :param domain: Specify the domain of accepted values as (min, max,)
+        :type domain: tuple
+        """
         if domain and (not isinstance(domain, tuple) or len(domain) != 2):
             raise TypeError("'domain' has to be a tuple providing inclusive domain like: (min,max)")
         self.domain = domain
@@ -155,6 +163,11 @@ class IntegerField(ConfigField):
 class ArrayField(ConfigField):
 
     def __init__(self, field, **kwargs):
+        """
+        Stores an array of ConfigField(s).
+        :param field: An ConfigField instance describing the values in the list.
+        :type field: ConfigField
+        """
         if not isinstance(field, ConfigField):
             raise TypeError("'field' has to be a ConfigField.")
         self.field = field
