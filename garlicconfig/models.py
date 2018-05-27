@@ -1,7 +1,12 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import copy
 
 from garlicconfig.exceptions import ValidationError
 from garlicconfig.fields import ConfigField
+
+import six
 
 
 class ModelMetaInfo(object):
@@ -30,9 +35,8 @@ class ModelMetaClass(type):
         return new_class
 
 
+@six.add_metaclass(ModelMetaClass)
 class ConfigModel(object):
-
-    __metaclass__ = ModelMetaClass
 
     def __init__(self):
         for field_name in self.__meta__.fields:

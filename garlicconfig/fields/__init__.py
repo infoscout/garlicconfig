@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from garlicconfig.exceptions import ValidationError
 from garlicconfig.utils import assert_value_type
+
+import six
 
 
 class ConfigField(object):
@@ -25,7 +30,7 @@ class ConfigField(object):
         self.__validate__(self.default)  # make sure default value is valid
 
         # it's nice to raise an exception when we get an unexpected argument so it's extra clear we're not handling it.
-        unrecognized_args = filter(lambda arg_name: arg_name not in self.__init_args, kwargs)
+        unrecognized_args = [arg for arg in kwargs if arg not in self.__init_args]
         if unrecognized_args:
             raise TypeError("Argument '{arg_name}' is not recognized.".format(arg_name=unrecognized_args[0]))
 
@@ -107,7 +112,7 @@ class StringField(ConfigField):
 
     def validate(self, value):
         super(StringField, self).validate(value)
-        assert_value_type(value, str, self.name)
+        assert_value_type(value, six.text_type, self.name)
         if self.choices and value not in self.choices:
             raise ValidationError("Value '{given}' for '{key}' is not accepted. Choices are '{choices}'".format(
                 given=value,
@@ -180,10 +185,10 @@ class ArrayField(ConfigField):
             self.field.validate(item)
 
     def to_model_value(self, value):
-        return map(lambda x: self.field.to_model_value(x), value) if value else None
+        return list(map(lambda x: self.field.to_model_value(x), value)) if value else None
 
     def to_dict_value(self, value):
-        return map(lambda x: self.field.to_dict_value(x), value) if value else None
+        return list(map(lambda x: self.field.to_dict_value(x), value)) if value else None
 
     def __extra_desc__(self):
         return {

@@ -21,9 +21,9 @@ jobs:
                     source venv/bin/activate
                     flake8 garlicconfig
 
-    test-suite:
+    test-suite-py3.6: &test-template
         docker:
-            - image: circleci/python:2.7.13
+            - image: circleci/python:3.6
         steps:
             - checkout
             - run:
@@ -33,6 +33,7 @@ jobs:
                 name: Install Coverage
                 command: |
                     source venv/bin/activate
+                    python setup.py install
                     pip install coverage
             - run:
                 name: Run tests
@@ -41,9 +42,15 @@ jobs:
                     coverage run tests.py
                     bash <(curl -s https://codecov.io/bash) -t 2a289a72-91f5-4a4c-b011-fc9288666a49
 
+    test-suite-py2.7:
+        <<: *test-template
+        docker:
+            - image: circleci/python:2.7
+
 workflows:
     version: 2
     pr-checks:
         jobs:
-            - test-suite
+            - test-suite-py3.6
+            - test-suite-py2.7
             - lint-checks
