@@ -1,6 +1,5 @@
-"""
-All garlic specific exceptions that can be raised.
-"""
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 
 class ValidationError(Exception):

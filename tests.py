@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import copy
 import json
 import os
@@ -59,7 +62,7 @@ class TestConfigFields(unittest.TestCase):
             testfield = StringField(default=25, nullable=False)
 
         with self.assertRaises(TypeError):
-            testfield = StringField(default=None, nullable=False, choices='peyman,sth')  # invalid choices
+            testfield = StringField(default=None, nullable=False, choices=15)  # invalid choices
 
         testfield = StringField(default='value1', nullable=False, choices=('value1', 'value2',))
         with self.assertRaises(ValidationError):

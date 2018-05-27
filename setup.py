@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from setuptools import find_packages, setup
 
 with open('VERSION', 'r') as reader:
@@ -20,6 +23,6 @@ setup(
     long_description_content_type='text/markdown; charset=UTF-8',
     url='https://github.com/infoscout/garlicconfig',
     download_url='https://github.com/infoscout/garlicconfig/archive/{version}.tar.gz'.format(version=version),
-    version=version,
+    install_requires=['six'],
     keywords=['configs', 'settings']
 )

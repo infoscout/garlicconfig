@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from garlicconfig.exceptions import ValidationError
 from garlicconfig.models import ConfigModel
 
@@ -10,7 +13,7 @@ class ModelField(ConfigField):
         """
         A field that stores another config field as a subsection.
         :param model_class: Any class of type ConfigModel to store as a subsection.
-        :type model_class: ConfigModel
+        :type model_class: Type[ConfigModel]
         """
         if not isinstance(model_class, type):
             raise TypeError("'model_class' has to be a type.")

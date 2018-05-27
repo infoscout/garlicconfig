@@ -1,13 +1,17 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import os
 import re
 from abc import ABCMeta, abstractmethod
 
+import six
+
 from garlicconfig.exceptions import ConfigNotFound
 
 
+@six.add_metaclass(ABCMeta)
 class ConfigRepository(object):
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def all(self):
@@ -62,7 +66,7 @@ class MemoryConfigRepository(ConfigRepository):
         self.storage = {}
 
     def all(self):
-        return self.storage.iterkeys()
+        return self.storage.keys()
 
     def retrieve(self, name):
         if name in self.storage:
