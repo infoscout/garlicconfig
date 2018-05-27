@@ -33,6 +33,7 @@ jobs:
                 name: Install Coverage
                 command: |
                     source venv/bin/activate
+                    python setup.py install
                     pip install coverage
             - run:
                 name: Run tests
