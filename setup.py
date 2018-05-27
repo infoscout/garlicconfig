@@ -23,6 +23,7 @@ setup(
     long_description_content_type='text/markdown; charset=UTF-8',
     url='https://github.com/infoscout/garlicconfig',
     download_url='https://github.com/infoscout/garlicconfig/archive/{version}.tar.gz'.format(version=version),
+    version=version,
     install_requires=['six'],
     keywords=['configs', 'settings']
 )
