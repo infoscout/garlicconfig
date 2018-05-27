@@ -7,6 +7,11 @@ from . import ConfigField, assert_value_type
 class ModelField(ConfigField):
 
     def __init__(self, model_class, **kwargs):
+        """
+        A field that stores another config field as a subsection.
+        :param model_class: Any class of type ConfigModel to store as a subsection.
+        :type model_class: ConfigModel
+        """
         if not isinstance(model_class, type):
             raise TypeError("'model_class' has to be a type.")
         if not issubclass(model_class, ConfigModel):
