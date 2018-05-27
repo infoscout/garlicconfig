@@ -110,6 +110,14 @@ class JsonEncoder(ConfigEncoder):
 
 
 def encode(config, cls=None, pretty=True):
+    """
+    Encodes a config instance.
+    :param config: Any instance of ConfigModel.
+    :type config: ConfigModel
+    :param cls: The encoder class. Must be of type ConfigEncoder.
+    :type cls: ConfigEncoder
+    :param pretty: Whether or not the encoder should attempt to return a human readable format.
+    """
     cls = cls or JsonEncoder  # default to json
     if not issubclass(cls, ConfigEncoder):
         raise TypeError("'cls' must be a ConfigEncoder")
@@ -117,6 +125,13 @@ def encode(config, cls=None, pretty=True):
 
 
 def decode(data, config_class, cls=None):
+    """
+    Decodes the raw data using a decoder to a config instance.
+    :param data: The raw data to be processed by the encoder.
+    :param config_class: The config model class, to be used as a model for validation.
+    :type config_class: ConfigModel
+    :param cls: The encoder class. Must be of type ConfigEncoder.
+    """
     cls = cls or JsonEncoder
     if not issubclass(cls, ConfigEncoder):
         raise TypeError("'cls' must be a ConfigEncoder")
