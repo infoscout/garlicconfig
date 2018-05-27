@@ -32,6 +32,7 @@ from garlicconfig import fields
 from garlicconfig.exceptions import ValidationError
 
 class EvenIntegerField(IntegerField):
+
     def validate(self, value):
         if value % 2 != 0:
             raise ValidationError('bad integer')
@@ -43,12 +44,13 @@ class EvenIntegerField(IntegerField):
         return str(value)
 ```
 
-This field will use string in the saved python dictionary. However, for the materialized config model, it'll use integer. We're also raising an exception when a given value is not accepted.
+The field class above stores str in the python dictionary representation. However, for the materialized config model, integer is used. It also invalidates unaccepted values, in this case odd values.
 
 for example:
 
 ```python
 class SomeRandomConfig(ConfigModel):
+
 	value = EvenIntegerField(nullable=False, default=2)
 ```
 
