@@ -359,6 +359,7 @@ class TestConfigModel(unittest.TestCase):
 
 
 class TestEncoder(unittest.TestCase):
+
     class Test(ConfigModel):
         name = StringField()
         age = IntegerField()
@@ -454,6 +455,7 @@ class TestEncoder(unittest.TestCase):
 
 
 class TestMemoryConfigRepository(unittest.TestCase):
+
     def test_memory_repo(self):
         memory_repo = MemoryConfigRepository()
         self.assertEqual(list(memory_repo.all()), [])
@@ -465,6 +467,7 @@ class TestMemoryConfigRepository(unittest.TestCase):
 
 
 class TestFileConfigRepository(unittest.TestCase):
+
     TEST_DIR = 'testdata'
 
     def setUp(self):
