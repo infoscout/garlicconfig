@@ -28,10 +28,10 @@ class TestConfigFields(unittest.TestCase):
         self.assertEqual(test_field.default, None)
         self.assertEqual(test_field.nullable, True)
 
-        test_field = ConfigField(default=25, nullable=False)  # should not raise
-        test_field = ConfigField(default=None, nullable=True)  # should not raise
+        ConfigField(default=25, nullable=False)  # should not raise
+        ConfigField(default=None, nullable=True)  # should not raise
         with self.assertRaises(ValidationError):
-            test_field = ConfigField(default=None, nullable=False)  # can't set an invalid default value.
+            ConfigField(default=None, nullable=False)  # can't set an invalid default value.
 
         # to make sure field's validate gets called properly
         class SomeField(ConfigField):
@@ -48,7 +48,7 @@ class TestConfigFields(unittest.TestCase):
         with self.assertRaises(ValueError):
             test_field.__validate__(24)  # bad default value; should raise
 
-        test_field = SomeField(default=25, nullable=False)  # shouldn't raise
+        SomeField(default=25, nullable=False)  # shouldn't raise
 
     def test_string(self):
         # test null and default
@@ -56,13 +56,13 @@ class TestConfigFields(unittest.TestCase):
         test_field.validate('test string')  # make sure it doesn't raise
 
         with self.assertRaises(ValidationError):
-            test_field = StringField(default=None, nullable=False)
+            StringField(default=None, nullable=False)
 
         with self.assertRaises(ValidationError):
-            test_field = StringField(default=25, nullable=False)
+            StringField(default=25, nullable=False)
 
         with self.assertRaises(TypeError):
-            test_field = StringField(default=None, nullable=False, choices=15)  # invalid choices
+            StringField(default=None, nullable=False, choices=15)  # invalid choices
 
         test_field = StringField(default='value1', nullable=False, choices=('value1', 'value2',))
         with self.assertRaises(ValidationError):
@@ -82,7 +82,7 @@ class TestConfigFields(unittest.TestCase):
             test_field.validate('Rick Sanchez')
 
         with self.assertRaises(TypeError):
-            test_field = IntegerField(range='peyman')
+            IntegerField(range='peyman')
 
         test_field = IntegerField(domain=(1, 100))
         test_field.validate(1)  # inclusive lower bound
@@ -96,7 +96,7 @@ class TestConfigFields(unittest.TestCase):
             test_field.validate(101)
 
         with self.assertRaises(TypeError):
-            test_field = IntegerField(domain=12)
+            IntegerField(domain=12)
 
     def test_model(self):
         class Test(ConfigModel):
@@ -109,13 +109,13 @@ class TestConfigFields(unittest.TestCase):
             name = StringField()
 
         with self.assertRaises(ValueError):
-            test_field = ModelField(model_class=str)
+            ModelField(model_class=str)
 
         with self.assertRaises(ValueError):
-            test_field = ModelField(model_class=BadClass)
+            ModelField(model_class=BadClass)
 
         with self.assertRaises(TypeError):
-            test_field = ModelField(model_class=BadClass())
+            ModelField(model_class=BadClass())
 
         test_field = ModelField(model_class=Test)
         test_field.validate(Test())
@@ -124,7 +124,7 @@ class TestConfigFields(unittest.TestCase):
 
         test_model = test_field.to_model_value({'name': 'Mark Rothko'})
         self.assertEqual(test_model.name, 'Mark Rothko')
-        test_model = test_field.to_model_value({})
+        test_field.to_model_value({})
         test_model = test_field.to_model_value(None)
         self.assertEqual(test_field.to_dict_value(None), None)
         self.assertEqual(test_field.to_dict_value(test_model), None)
@@ -147,7 +147,7 @@ class TestConfigFields(unittest.TestCase):
         self.assertEqual(test_model[0].age, 1)
         self.assertEqual(test_model[1].age, 2)
         with self.assertRaises(ValidationError):
-            test_model = test_field.to_model_value('peyman')
+            test_field.to_model_value('peyman')
 
         test_field = ArrayField(field=StringField(choices=('a', 'b'), nullable=True))
         self.assertEqual(test_field.to_model_value(['a', 'b']), ['a', 'b'])
@@ -211,14 +211,14 @@ class TestConfigModel(unittest.TestCase):
         self.assertEqual(test.name, 'Jack Skellington')
 
         with self.assertRaises(ValidationError):
-            test = self.ChildModel.load_dict(
+            self.ChildModel.load_dict(
                 {
                     'age': '25'
                 }
             )
 
         with self.assertRaises(ValidationError):
-            test = self.ChildModel.load_dict({  # should raise ValidationError because age and working are not provided.
+            self.ChildModel.load_dict({  # should raise ValidationError because age and working are not provided.
                 'occupation': 'peyman'
             })
 
@@ -250,7 +250,7 @@ class TestConfigModel(unittest.TestCase):
         self.assertEqual(test.info.occupation, None)
 
         with self.assertRaises(ValidationError):
-            test = BigConfig.load_dict({
+            BigConfig.load_dict({
                 'info': {
                     'age': '21',  # make sure we properly raise ValidationError
                     'working': False,
