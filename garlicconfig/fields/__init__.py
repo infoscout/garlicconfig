@@ -112,7 +112,10 @@ class StringField(ConfigField):
 
     def validate(self, value):
         super(StringField, self).validate(value)
-        assert_value_type(value, six.text_type, self.name)
+        try:
+            assert_value_type(value, basestring, self.name)
+        except NameError:
+            assert_value_type(value, six.text_type, self.name)
         if self.choices and value not in self.choices:
             raise ValidationError("Value '{given}' for '{key}' is not accepted. Choices are '{choices}'".format(
                 given=value,
