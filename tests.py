@@ -24,14 +24,14 @@ class TestConfigFields(unittest.TestCase):
         Test ConfigField to make sure it behaves correctly.
         This is the only place we should test __validate__, other tests should use Model.validate instead.
         """
-        testfield = ConfigField()
-        self.assertEqual(testfield.default, None)
-        self.assertEqual(testfield.nullable, True)
+        test_field = ConfigField()
+        self.assertEqual(test_field.default, None)
+        self.assertEqual(test_field.nullable, True)
 
-        testfield = ConfigField(default=25, nullable=False)  # should not raise
-        testfield = ConfigField(default=None, nullable=True)  # should not raise
+        ConfigField(default=25, nullable=False)  # should not raise
+        ConfigField(default=None, nullable=True)  # should not raise
         with self.assertRaises(ValidationError):
-            testfield = ConfigField(default=None, nullable=False)  # can't set an invalid default value.
+            ConfigField(default=None, nullable=False)  # can't set an invalid default value.
 
         # to make sure field's validate gets called properly
         class SomeField(ConfigField):
@@ -39,64 +39,64 @@ class TestConfigFields(unittest.TestCase):
                 if value != 25:
                     raise ValueError()
 
-        testfield = SomeField(default=None, nullable=True)  # shouldn't raise cause it's null and it's permitted.
-        testfield.__validate__(None)  # shouldn't raise because of the same reason
-        testfield.__validate__(25)  # shouldn't raise because SomeFields's validate method doesn't raise.
+        test_field = SomeField(default=None, nullable=True)  # shouldn't raise cause it's null and it's permitted.
+        test_field.__validate__(None)  # shouldn't raise because of the same reason
+        test_field.__validate__(25)  # shouldn't raise because SomeFields's validate method doesn't raise.
         with self.assertRaises(ValueError):
-            testfield.__validate__(20)  # bad value; should raise because SomeField's validate method raises Exception
+            test_field.__validate__(20)  # bad value; should raise because SomeField's validate method raises Exception
 
         with self.assertRaises(ValueError):
-            testfield.__validate__(24)  # bad default value; should raise
+            test_field.__validate__(24)  # bad default value; should raise
 
-        testfield = SomeField(default=25, nullable=False)  # shouldn't raise
+        SomeField(default=25, nullable=False)  # shouldn't raise
 
     def test_string(self):
         # test null and default
-        testfield = StringField(default=None, nullable=True)
-        testfield.validate('test string')  # make sure it doesn't raise
+        test_field = StringField(default=None, nullable=True)
+        test_field.validate('test string')  # make sure it doesn't raise
 
         with self.assertRaises(ValidationError):
-            testfield = StringField(default=None, nullable=False)
+            StringField(default=None, nullable=False)
 
         with self.assertRaises(ValidationError):
-            testfield = StringField(default=25, nullable=False)
+            StringField(default=25, nullable=False)
 
         with self.assertRaises(TypeError):
-            testfield = StringField(default=None, nullable=False, choices=15)  # invalid choices
+            StringField(default=None, nullable=False, choices=15)  # invalid choices
 
-        testfield = StringField(default='value1', nullable=False, choices=('value1', 'value2',))
+        test_field = StringField(default='value1', nullable=False, choices=('value1', 'value2',))
         with self.assertRaises(ValidationError):
-            testfield.validate('something')
-        testfield.validate('value2')
+            test_field.validate('something')
+        test_field.validate('value2')
 
     def test_bool(self):
-        testfield = BooleanField(default=False, nullable=False)
+        test_field = BooleanField(default=False, nullable=False)
         with self.assertRaises(ValidationError):
-            testfield.validate('some random string')
-        testfield.validate(True)
+            test_field.validate('some random string')
+        test_field.validate(True)
 
     def test_int(self):
-        testfield = IntegerField(default=0, nullable=False)  # make sure we don't confuse 0 with None
-        testfield.validate(-1)
+        test_field = IntegerField(default=0, nullable=False)  # make sure we don't confuse 0 with None
+        test_field.validate(-1)
         with self.assertRaises(ValidationError):
-            testfield.validate('Rick Sanchez')
+            test_field.validate('Rick Sanchez')
 
         with self.assertRaises(TypeError):
-            testfield = IntegerField(range='peyman')
+            IntegerField(range='peyman')
 
-        testfield = IntegerField(domain=(1, 100))
-        testfield.validate(1)  # inclusive lower bound
-        testfield.validate(50)
-        testfield.validate(100)  # inclusive upper bound
-
-        with self.assertRaises(ValidationError):
-            testfield.validate(-1)
+        test_field = IntegerField(domain=(1, 100))
+        test_field.validate(1)  # inclusive lower bound
+        test_field.validate(50)
+        test_field.validate(100)  # inclusive upper bound
 
         with self.assertRaises(ValidationError):
-            testfield.validate(101)
+            test_field.validate(-1)
+
+        with self.assertRaises(ValidationError):
+            test_field.validate(101)
 
         with self.assertRaises(TypeError):
-            testfield = IntegerField(domain=12)
+            IntegerField(domain=12)
 
     def test_model(self):
         class Test(ConfigModel):
@@ -109,53 +109,53 @@ class TestConfigFields(unittest.TestCase):
             name = StringField()
 
         with self.assertRaises(ValueError):
-            testfield = ModelField(model_class=str)
+            ModelField(model_class=str)
 
         with self.assertRaises(ValueError):
-            testfield = ModelField(model_class=BadClass)
+            ModelField(model_class=BadClass)
 
         with self.assertRaises(TypeError):
-            testfield = ModelField(model_class=BadClass())
+            ModelField(model_class=BadClass())
 
-        testfield = ModelField(model_class=Test)
-        testfield.validate(Test())
+        test_field = ModelField(model_class=Test)
+        test_field.validate(Test())
         with self.assertRaises(ValidationError):
-            testfield.validate(WrongConfigModel())
+            test_field.validate(WrongConfigModel())
 
-        testmodel = testfield.to_model_value({'name': 'Mark Rothko'})
-        self.assertEqual(testmodel.name, 'Mark Rothko')
-        testmodel = testfield.to_model_value({})
-        testmodel = testfield.to_model_value(None)
-        self.assertEqual(testfield.to_dict_value(None), None)
-        self.assertEqual(testfield.to_dict_value(testmodel), None)
+        test_model = test_field.to_model_value({'name': 'Mark Rothko'})
+        self.assertEqual(test_model.name, 'Mark Rothko')
+        test_field.to_model_value({})
+        test_model = test_field.to_model_value(None)
+        self.assertEqual(test_field.to_dict_value(None), None)
+        self.assertEqual(test_field.to_dict_value(test_model), None)
 
     def test_array(self):
         class Test(ConfigModel):
             age = IntegerField()
 
-        testfield = ArrayField(field=ModelField(model_class=Test), default=[])
-        testfield.validate([])
+        test_field = ArrayField(field=ModelField(model_class=Test), default=[])
+        test_field.validate([])
         with self.assertRaises(TypeError):
-            testfield = ArrayField(field='something')
+            test_field = ArrayField(field='something')
         with self.assertRaises(ValidationError):
-            testfield.validate([1, 2, 3])
+            test_field.validate([1, 2, 3])
         with self.assertRaises(ValidationError):
-            testfield.validate(['1', '2'])
-        testfield.validate([Test(), Test()])
+            test_field.validate(['1', '2'])
+        test_field.validate([Test(), Test()])
 
-        testmodel = testfield.to_model_value([{'age': 1}, {'age': 2}])
-        self.assertEqual(testmodel[0].age, 1)
-        self.assertEqual(testmodel[1].age, 2)
+        test_model = test_field.to_model_value([{'age': 1}, {'age': 2}])
+        self.assertEqual(test_model[0].age, 1)
+        self.assertEqual(test_model[1].age, 2)
         with self.assertRaises(ValidationError):
-            testmodel = testfield.to_model_value('peyman')
+            test_field.to_model_value('peyman')
 
-        testfield = ArrayField(field=StringField(choices=('a', 'b'), nullable=True))
-        self.assertEqual(testfield.to_model_value(['a', 'b']), ['a', 'b'])
-        self.assertEqual(testfield.to_model_value(('a', 'b')), ['a', 'b'])
-        self.assertEqual(testfield.to_dict_value(['a', 'b']), ['a', 'b'])
+        test_field = ArrayField(field=StringField(choices=('a', 'b'), nullable=True))
+        self.assertEqual(test_field.to_model_value(['a', 'b']), ['a', 'b'])
+        self.assertEqual(test_field.to_model_value(('a', 'b')), ['a', 'b'])
+        self.assertEqual(test_field.to_dict_value(['a', 'b']), ['a', 'b'])
 
-        testfield = ArrayField(field=ModelField(model_class=Test))
-        dict_value = testfield.to_dict_value([
+        test_field = ArrayField(field=ModelField(model_class=Test))
+        dict_value = test_field.to_dict_value([
             Test.load_dict({'age': 12}),
             Test.load_dict({'age': 13})
         ])
@@ -176,8 +176,8 @@ class TestConfigModel(unittest.TestCase):
         name = StringField()
 
     def test_inheritance(self):
-        self.assertEqual(set(self.ParentModel.__meta__.fields), set(['age', 'name']))
-        self.assertEqual(set(self.ChildModel.__meta__.fields), set(['age', 'name', 'working', 'occupation']))
+        self.assertEqual(set(self.ParentModel.__meta__.fields), {'age', 'name'})
+        self.assertEqual(set(self.ChildModel.__meta__.fields), {'age', 'name', 'working', 'occupation'})
 
         # test with an instance
         test = self.ChildModel()
@@ -211,14 +211,14 @@ class TestConfigModel(unittest.TestCase):
         self.assertEqual(test.name, 'Jack Skellington')
 
         with self.assertRaises(ValidationError):
-            test = self.ChildModel.load_dict(
+            self.ChildModel.load_dict(
                 {
                     'age': '25'
                 }
             )
 
         with self.assertRaises(ValidationError):
-            test = self.ChildModel.load_dict({  # should raise ValidationError because age and working are not provided.
+            self.ChildModel.load_dict({  # should raise ValidationError because age and working are not provided.
                 'occupation': 'peyman'
             })
 
@@ -250,7 +250,7 @@ class TestConfigModel(unittest.TestCase):
         self.assertEqual(test.info.occupation, None)
 
         with self.assertRaises(ValidationError):
-            test = BigConfig.load_dict({
+            BigConfig.load_dict({
                 'info': {
                     'age': '21',  # make sure we properly raise ValidationError
                     'working': False,
@@ -359,6 +359,7 @@ class TestConfigModel(unittest.TestCase):
 
 
 class TestEncoder(unittest.TestCase):
+
     class Test(ConfigModel):
         name = StringField()
         age = IntegerField()
@@ -454,6 +455,7 @@ class TestEncoder(unittest.TestCase):
 
 
 class TestMemoryConfigRepository(unittest.TestCase):
+
     def test_memory_repo(self):
         memory_repo = MemoryConfigRepository()
         self.assertEqual(list(memory_repo.all()), [])
@@ -465,6 +467,7 @@ class TestMemoryConfigRepository(unittest.TestCase):
 
 
 class TestFileConfigRepository(unittest.TestCase):
+
     TEST_DIR = 'testdata'
 
     def setUp(self):
@@ -482,7 +485,7 @@ class TestFileConfigRepository(unittest.TestCase):
         with open(os.path.join(self.TEST_DIR, '.DS_Store'), 'w') as f:
             f.write('something')
 
-        self.assertEqual(set(file_repo.all()), set(['config1']))
+        self.assertEqual(set(file_repo.all()), {'config1'})
 
     def tearDown(self):
         shutil.rmtree(self.TEST_DIR)
