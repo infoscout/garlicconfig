@@ -176,8 +176,8 @@ class TestConfigModel(unittest.TestCase):
         name = StringField()
 
     def test_inheritance(self):
-        self.assertEqual(set(self.ParentModel.__meta__.fields), set(['age', 'name']))
-        self.assertEqual(set(self.ChildModel.__meta__.fields), set(['age', 'name', 'working', 'occupation']))
+        self.assertEqual(set(self.ParentModel.__meta__.fields), {'age', 'name'})
+        self.assertEqual(set(self.ChildModel.__meta__.fields), {'age', 'name', 'working', 'occupation'})
 
         # test with an instance
         test = self.ChildModel()
@@ -482,7 +482,7 @@ class TestFileConfigRepository(unittest.TestCase):
         with open(os.path.join(self.TEST_DIR, '.DS_Store'), 'w') as f:
             f.write('something')
 
-        self.assertEqual(set(file_repo.all()), set(['config1']))
+        self.assertEqual(set(file_repo.all()), {'config1'})
 
     def tearDown(self):
         shutil.rmtree(self.TEST_DIR)
