@@ -5,6 +5,8 @@ from abc import ABCMeta, abstractmethod
 
 import six
 
+from layer import LayerRetriever
+
 
 @six.add_metaclass(ABCMeta)
 class ConfigManager(object):
@@ -22,3 +24,19 @@ class ConfigManager(object):
     @abstractmethod
     def resolve(self, path, **filters):
         pass
+
+
+class FlatConfigManager(ConfigManager):
+
+    def __init__(self, repository, decoder=None, default_config_name=None):
+        self.repository = repository
+        self.decoder = decoder
+        self.default_config_name = default_config_name
+        self.__layer_retriever = LayerRetriever(repository, decoder)
+
+    def iterconfigs(self):
+        for config in self.repository.list_configs():
+            yield config, self.__layer_retriever.retrieve(config)
+
+    def resolve(self, path, **filters):
+        return self.__layer_retriever.retrieve(filters.get('name', self.default_config_name)).resolve(path)
