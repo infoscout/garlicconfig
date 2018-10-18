@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import copy
 import json
 import os
 import shutil
@@ -11,10 +10,8 @@ import unittest
 from garlicconfig import encoder
 from garlicconfig.exceptions import ConfigNotFound, ValidationError
 from garlicconfig.fields import ArrayField, BooleanField, ConfigField, IntegerField, StringField
-from garlicconfig.fields.model import ModelField
-from garlicconfig.models import ConfigModel
+from garlicconfig.models import ConfigModel, ModelField
 from garlicconfig.repositories import FileConfigRepository, MemoryConfigRepository
-from garlicconfig.utils import merge
 
 
 class TestConfigFields(unittest.TestCase):
@@ -398,60 +395,6 @@ class TestEncoder(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             encoder.decode('{}', str)
-
-    def test_merge(self):
-        base = {
-            'name': 'Peyman',
-            'age': 21,
-            'settings': {
-                'version': 1,
-                'numbers': [1, 2, 3],
-                'tokens': {
-                    'a': 'a',
-                    'b': 'b',
-                }
-            }
-        }
-        config = {
-            'name': 'Patrick',
-            'nickname': 'Peymo',
-            'settings': {
-                'addedProperty': 'addedValue',
-                'numbers': [4, 5, 6],
-                'tokens': {
-                    'c': 'c',
-                    'b': 'd'
-                },
-                'vars': {
-                    'x': 12
-                }
-            }
-        }
-
-        base_copy = copy.deepcopy(base)
-        config_copy = copy.deepcopy(config)
-
-        expected_end_result = {
-            'name': 'Patrick',
-            'age': 21,
-            'nickname': 'Peymo',
-            'settings': {
-                'addedProperty': 'addedValue',
-                'numbers': [4, 5, 6],
-                'tokens': {
-                    'a': 'a',
-                    'b': 'd',
-                    'c': 'c'
-                },
-                'version': 1,
-                'vars': {
-                    'x': 12
-                }
-            }
-        }
-        self.assertEqual(merge(base, config), expected_end_result)
-        self.assertEqual(base_copy, base)  # make sure we didn't touch base
-        self.assertEqual(config_copy, config)  # make sure we didn't touch config
 
 
 class TestMemoryConfigRepository(unittest.TestCase):
