@@ -1,1 +1,1 @@
-https://gitlab.com/peymanmortazavi/garlicconfig/-/archive/master/garlicconfig-master.tar.gz
+infoscout/garlicconfig-core@1.0.0
