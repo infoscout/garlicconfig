@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 
 from abc import ABCMeta, abstractmethod
 
-import six
+from garlicconfig.layer import LayerRetriever
 
-from layer import LayerRetriever
+import six
 
 
 @six.add_metaclass(ABCMeta)

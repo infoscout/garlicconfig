@@ -74,9 +74,9 @@ class ConfigModel(object):
         return obj
 
     @classmethod
-    def resolve_field(cls, path):
-        parts = path.split('.')
-        current_field = None
+    def resolve_field(cls, str path):
+        cdef list parts = path.split('.')
+        cdef ConfigField current_field = None
         current_model = cls
         for part in parts:
             try:
