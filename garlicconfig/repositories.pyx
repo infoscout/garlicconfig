@@ -1,5 +1,4 @@
 from libcpp.string cimport string
-from libcpp cimport bool
 
 from exceptions cimport raise_py_error
 from repositories cimport NativeConfigRepository, NativeFileConfigRepository, NativeMemoryConfigRepository

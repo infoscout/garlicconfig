@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from garlicconfig.exceptions import ValidationError
 from garlicconfig.utils import assert_value_type
 
 import six
 
 
-class ConfigField(object):
+cdef class ConfigField(object):
     """
     Abstract class for all config fields.
     """
@@ -27,7 +24,7 @@ class ConfigField(object):
         self.nullable = kwargs.get('nullable', True)
         self.default = kwargs.get('default')
         self.desc = kwargs.get('desc')
-        self.__validate__(self.default)  # make sure default value is valid
+        self.native_validate(self.default, False)  # make sure default value is valid
 
         # it's nice to raise an exception when we get an unexpected argument so it's extra clear we're not handling it.
         unrecognized_args = [arg for arg in kwargs if arg not in self.__init_args]
@@ -41,12 +38,12 @@ class ConfigField(object):
         """
         return self.friendly_name or type(self).__name__
 
-    def __validate__(self, value):
+    cdef void native_validate(self, value, null_check) except +:
         """
         Low level method for validation. Do not use this method outside of this package, it's prone to change without
         further notice.
         """
-        if value is None and not self.nullable:
+        if value is None and null_check and not self.nullable:
             raise ValidationError("Value for '{key}' is not allowed to be null.".format(key=self.name))
         elif value is not None:
             self.validate(value)
@@ -67,7 +64,7 @@ class ConfigField(object):
         """
         return value
 
-    def to_dict_value(self, value):
+    def to_garlic_value(self, value):
         """
         Given a model value, return a basic value type to be stored in a python dictionary.
         Note that this value must only hold basic types: list of integers is acceptable but a custom class is not.
@@ -78,10 +75,10 @@ class ConfigField(object):
         """
         Generate a dictionary describing the structure of this field.
         """
-        extra_obj = self.__extra_desc__() or {}
+        cdef dict extra_obj = self.__extra_desc__() or {}
         extra_obj.update({
             'nullable': self.nullable,
-            'default': self.to_dict_value(self.default),
+            'default': self.to_garlic_value(self.default),
         })
         return {
             'name': self.name,
@@ -144,8 +141,8 @@ class IntegerField(ConfigField):
         :param domain: Specify the domain of accepted values as (min, max,)
         :type domain: tuple
         """
-        if domain and (not isinstance(domain, tuple) or len(domain) != 2):
-            raise TypeError("'domain' has to be a tuple providing inclusive domain like: (min,max)")
+        if domain and (not isinstance(domain, (tuple, list)) or len(domain) != 2):
+            raise TypeError("'domain' has to be a tuple or list providing inclusive domain like: (min,max)")
         self.domain = domain
         super(IntegerField, self).__init__(**kwargs)
 
@@ -188,10 +185,10 @@ class ArrayField(ConfigField):
             self.field.validate(item)
 
     def to_model_value(self, value):
-        return list(map(lambda x: self.field.to_model_value(x), value)) if value else None
+        return map(self.field.to_model_value, value) if value else None
 
-    def to_dict_value(self, value):
-        return list(map(lambda x: self.field.to_dict_value(x), value)) if value else None
+    def to_garlic_value(self, value):
+        return map(self.field.to_garlic_value, value) if value else None
 
     def __extra_desc__(self):
         return {

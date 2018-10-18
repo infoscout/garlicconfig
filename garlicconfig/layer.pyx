@@ -1,15 +1,52 @@
+from collections import Iterable
+
 from cython.operator cimport dereference as deref, preincrement as inc
 from libcpp.map cimport map
+from libcpp.memory cimport shared_ptr
 from libcpp.string cimport string
 from libcpp.vector cimport vector
-from libcpp.memory cimport shared_ptr
+import six
 
-from encoding cimport NativeDecoder, JsonDecoder
-from exceptions cimport raise_py_error
-from repositories cimport NativeConfigRepository
+from garlicconfig.encoding cimport NativeDecoder, JsonDecoder
+from garlicconfig.exceptions cimport raise_py_error
+from garlicconfig.repositories cimport NativeConfigRepository
+
+
+try:
+    available_str = basestring
+except NameError:
+    available_str = six.text_type
 
 
 cdef class GarlicValue(object):
+
+    def __init__(self, value):
+        self.native_value = GarlicValue.init_layer_value(value)
+
+    @staticmethod
+    cdef shared_ptr[LayerValue] init_layer_value(object value) except +:
+        cdef ObjectValue* object_value = NULL
+        cdef ListValue* list_value = NULL
+        if isinstance(value, int):
+            return shared_ptr[LayerValue](new IntegerValue(value))
+        elif isinstance(value, float):
+            return shared_ptr[LayerValue](new DoubleValue(value))
+        elif isinstance(value, available_str):
+            return shared_ptr[LayerValue](new StringValue(value))
+        elif isinstance(value, bool):
+            return shared_ptr[LayerValue](new BoolValue(value))
+        elif isinstance(value, dict):
+            object_value = new ObjectValue()
+            for key in value:
+                deref(object_value).set(key, GarlicValue.init_layer_value(value[key]))
+            return shared_ptr[LayerValue](object_value)
+        elif isinstance(value, Iterable):
+            list_value = new ListValue()
+            for item in value:
+                deref(list_value).add(GarlicValue.init_layer_value(item))
+            return shared_ptr[LayerValue](list_value)
+        else:
+            raise TypeError('Unsupported Type: {invalid_type}'.format(invalid_type=type(value).__name__))
 
     @staticmethod
     cdef map_object(const shared_ptr[LayerValue]& value):
@@ -17,7 +54,7 @@ cdef class GarlicValue(object):
         cdef map[string, shared_ptr[LayerValue]].const_iterator it = deref(value).begin_member()
         cdef map[string, shared_ptr[LayerValue]].const_iterator end = deref(value).end_member()
         while it != end:
-            return_value[deref(it).first] = GarlicValue.map_value(deref(it).second)
+            return_value[deref(it).first.decode("utf-8")] = GarlicValue.map_value(deref(it).second)
             inc(it)
         return return_value
 
@@ -46,7 +83,7 @@ cdef class GarlicValue(object):
         elif deref(value).is_array():
             return GarlicValue.map_list(value)
 
-    def as_dict(self):
+    def py_value(self):
         return GarlicValue.map_value(self.native_value)
 
     def resolve(self, const string& path):
@@ -61,8 +98,8 @@ cdef class GarlicValue(object):
         deref(self.native_value).apply(value.native_value)
 
     @staticmethod
-    cdef native_load(const shared_ptr[LayerValue]& value):
-        garlic_value = GarlicValue()
+    cdef GarlicValue native_load(const shared_ptr[LayerValue]& value):
+        cdef GarlicValue garlic_value = GarlicValue.__new__(GarlicValue)
         garlic_value.native_value = value
         return garlic_value
 
