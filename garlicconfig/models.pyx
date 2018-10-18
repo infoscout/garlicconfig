@@ -73,6 +73,22 @@ class ConfigModel(object):
             obj[key] = field.get_field_desc_dict()
         return obj
 
+    @classmethod
+    def resolve_field(cls, path):
+        parts = path.split('.')
+        current_field = None
+        current_model = cls
+        for part in parts:
+            try:
+                current_field = current_model.__meta__.fields[part]
+                if isinstance(current_field, ModelField):
+                    current_model = current_field.model_class
+                else:
+                    current_model = None
+            except (AttributeError, KeyError):  # If __meta__ is not available or key doesn't exist, return None.
+                return
+        return current_field
+
     def garlic_value(self):
         """
         Returns an instance of GarlicValue representing this model.
