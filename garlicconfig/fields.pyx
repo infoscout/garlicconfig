@@ -38,7 +38,7 @@ cdef class ConfigField(object):
         """
         return self.friendly_name or type(self).__name__
 
-    cdef void native_validate(self, value, null_check) except +:
+    cdef void native_validate(self, value, null_check) except *:
         """
         Low level method for validation. Do not use this method outside of this package, it's prone to change without
         further notice.

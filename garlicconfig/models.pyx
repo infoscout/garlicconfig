@@ -54,11 +54,12 @@ class ConfigModel(object):
         new_instance = cls()
         cdef str key
         cdef ConfigField field
-        for key, field in six.iteritems(cls.__meta__.fields):
-            try:
-                setattr(new_instance, key, field.to_model_value(value[key]))
-            except KeyError:
-                pass
+        if value:
+            for key, field in six.iteritems(cls.__meta__.fields):
+                try:
+                    setattr(new_instance, key, field.to_model_value(value[key]))
+                except KeyError:
+                    pass
         return new_instance
 
     @classmethod
