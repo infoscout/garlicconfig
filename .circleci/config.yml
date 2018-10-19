@@ -16,14 +16,12 @@ aliases:
         command: |
             rm -fr build
             rm -fr dist
-            rm garlicconfig.egg-info
             $PYTHON_PATH/python setup.py install
             $PYTHON_PATH/python tests.py
     - &run-test-with-coverage
         command: |
             rm -fr build
             rm -fr dist
-            rm garlicconfig.egg-info
             $PYTHON_PATH/python setup.py install
             $PYTHON_PATH/pip install coverage
             $PYTHON_PATH/coverage run tests.py
