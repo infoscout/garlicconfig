@@ -58,32 +58,32 @@ jobs:
 
     test-linux-py27m:
         environment:
-            PYTHON_PATH: /opt/python/cp27-cp27m/bin/
+            PYTHON_PATH: /opt/python/cp27-cp27m/bin
         <<: *test-suite-linux-template
 
     test-linux-py27mu:
         environment:
-            PYTHON_PATH: /opt/python/cp27-cp27mu/bin/
+            PYTHON_PATH: /opt/python/cp27-cp27mu/bin
         <<: *test-suite-linux-template
 
     test-linux-py34m:
         environment:
-            PYTHON_PATH: /opt/python/cp34-cp34mu/bin/
+            PYTHON_PATH: /opt/python/cp34-cp34m/bin
         <<: *test-suite-linux-template
 
     test-linux-py35m:
         environment:
-            PYTHON_PATH: /opt/python/cp35-cp35mu/bin/
+            PYTHON_PATH: /opt/python/cp35-cp35m/bin
         <<: *test-suite-linux-template
 
     test-linux-py36m:
         environment:
-            PYTHON_PATH: /opt/python/cp36-cp36mu/bin/
+            PYTHON_PATH: /opt/python/cp36-cp36m/bin
         <<: *test-suite-linux-template
 
     test-linux-py37m:
         environment:
-            PYTHON_PATH: /opt/python/cp37-cp37mu/bin/
+            PYTHON_PATH: /opt/python/cp37-cp37m/bin
         <<: *test-suite-linux-template
 
 workflows:
