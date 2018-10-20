@@ -12,13 +12,8 @@ aliases:
             cget-{{ arch }}-{{ checksum "native_requirements.txt" }}
         paths:
             - "cget"
-    - &run-test
-        command: |
-            rm -fr build
-            rm -fr dist
-            $PYTHON_PATH/python setup.py install
-            $PYTHON_PATH/python tests/tests.py
     - &run-test-with-coverage
+        name: "Run Tests"
         command: |
             rm -fr build
             rm -fr dist
@@ -26,6 +21,19 @@ aliases:
             $PYTHON_PATH/pip install coverage
             $PYTHON_PATH/coverage run tests/tests.py
             bash <(curl -s https://codecov.io/bash) -t 2a289a72-91f5-4a4c-b011-fc9288666a49
+    - &update_ld_library_path
+        name: "Update Library Search Path"
+        command: echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64' >> $BASH_ENV
+    - &test-suite-linux-template
+        docker:
+            - image: peymanmo/many_x64
+        steps:
+            - checkout
+            - restore_cache: *restore_cache
+            - run: *install_dependencies
+            - save_cache: *save_cache
+            - run: *update_ld_library_path
+            - run: *run-test-with-coverage
 
 jobs:
     lint-checks:
@@ -48,48 +56,44 @@ jobs:
                     source venv/bin/activate
                     flake8 garlicconfig
 
-    test-suite-linux:
-        docker:
-            - image: peymanmo/many_x64
-        steps:
-            - checkout
-            - restore_cache: *restore_cache
-            - run: *install_dependencies
-            - save_cache: *save_cache
-            - run:
-                <<: *run-test
-                name: "Test :: Python 2.7 M"
-                environment:
-                    PYTHON_PATH: /opt/python/cp27-cp27m/bin/
-            - run:
-                <<: *run-test
-                name: "Test :: Python 2.7 M (Unicode)"
-                environment:
-                    PYTHON_PATH: /opt/python/cp27-cp27mu/bin/
-            - run:
-                <<: *run-test
-                name: "Test :: Python 3.4 M"
-                environment:
-                    PYTHON_PATH: /opt/python/cp34-cp34m/bin/
-            - run:
-                <<: *run-test
-                name: "Test :: Python 3.5 M"
-                environment:
-                    PYTHON_PATH: /opt/python/cp35-cp35m/bin/
-            - run:
-                <<: *run-test
-                name: "Test :: Python 3.6 M"
-                environment:
-                    PYTHON_PATH: /opt/python/cp36-cp36m/bin/
-            - run:
-                <<: *run-test-with-coverage
-                name: "Test :: Python 3.7 M"
-                environment:
-                    PYTHON_PATH: /opt/python/cp37-cp37m/bin/
+    test-linux-py27m:
+        environment:
+            PYTHON_PATH: /opt/python/cp27-cp27m/bin/
+        <<: *test-suite-linux-template
+
+    test-linux-py27mu:
+        environment:
+            PYTHON_PATH: /opt/python/cp27-cp27mu/bin/
+        <<: *test-suite-linux-template
+
+    test-linux-py34m:
+        environment:
+            PYTHON_PATH: /opt/python/cp34-cp34mu/bin/
+        <<: *test-suite-linux-template
+
+    test-linux-py35m:
+        environment:
+            PYTHON_PATH: /opt/python/cp35-cp35mu/bin/
+        <<: *test-suite-linux-template
+
+    test-linux-py36m:
+        environment:
+            PYTHON_PATH: /opt/python/cp36-cp36mu/bin/
+        <<: *test-suite-linux-template
+
+    test-linux-py37m:
+        environment:
+            PYTHON_PATH: /opt/python/cp37-cp37mu/bin/
+        <<: *test-suite-linux-template
 
 workflows:
     version: 2
     pr-checks:
         jobs:
-            - test-suite-linux
+            - test-linux-py27m
+            - test-linux-py27mu
+            - test-linux-py34m
+            - test-linux-py35m
+            - test-linux-py36m
+            - test-linux-py37m
             - lint-checks

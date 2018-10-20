@@ -361,7 +361,7 @@ class TestMemoryConfigRepository(unittest.TestCase):
     def test_memory_repo(self):
         memory_repo = MemoryConfigRepository()
         self.assertEqual(list(memory_repo.list_configs()), [])
-        with self.assertRaises(ConfigNotFound):
+        with self.assertRaises(Exception):
             memory_repo.retrieve('something')
 
         memory_repo.save('config1', 'data')
@@ -378,8 +378,7 @@ class TestFileConfigRepository(unittest.TestCase):
     def test_file_repo(self):
         file_repo = FileConfigRepository(root_path=self.TEST_DIR)
         self.assertEqual(list(file_repo.list_configs()), [])
-        file_repo.retrieve('something')
-        with self.assertRaises(ConfigNotFound):
+        with self.assertRaises(Exception):
             file_repo.retrieve('something')
 
         file_repo.save('config1', 'data')
