@@ -19,7 +19,8 @@ aliases:
             rm -fr dist
             $PYTHON_PATH/python setup.py install
             $PYTHON_PATH/pip install coverage
-            $PYTHON_PATH/coverage run tests/tests.py
+            cd tests
+            $PYTHON_PATH/coverage run tests.py
             bash <(curl -s https://codecov.io/bash) -t 2a289a72-91f5-4a4c-b011-fc9288666a49
     - &update_ld_library_path
         name: "Update Library Search Path"

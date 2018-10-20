@@ -21,26 +21,29 @@ cdef class ConfigRepository(object):
         List all available configs in this repository.
         :return: set of str
         """
+        cdef set[string] configs
         if self.native_repo:
-            return self.native_repo.list_configs()
+            configs = self.native_repo.list_configs()
+            for item in configs:
+                yield item.decode('UTF-8')
 
-    def save(self, const string& name, const string& content):
+    def save(self, name, content):
         """
         Save a config.
         :param name: The name of the config. Config data can later be accessed by passing this name to retrieve method.
         :param content: The str content of this config.
         """
         if self.native_repo:
-            save_str_to_repo(self.native_repo, name, content)
+            save_str_to_repo(self.native_repo, name.encode('UTF-8'), content.encode('UTF-8'))
 
-    def retrieve(self, const string& name):
+    def retrieve(self, name):
         """
         Retrieve a config. If no config with such name is available, ConfigNotFound exception gets raised.
         :param name: Name of the config.
         :return: str
         """
         if self.native_repo:
-            return read_str_from_repo(self.native_repo, name)
+            return read_str_from_repo(self.native_repo, name.encode('UTF-8')).decode('UTF-8')
 
     def __dealloc__(self):
         if self.native_repo:
@@ -53,7 +56,7 @@ cdef class FileConfigRepository(ConfigRepository):
     """
 
     def __init__(self, root_path):
-        self.native_repo = self.file_repo = new NativeFileConfigRepository(root_path)
+        self.native_repo = self.file_repo = new NativeFileConfigRepository(root_path.encode('UTF-8'))
 
 
 cdef class MemoryConfigRepository(ConfigRepository):

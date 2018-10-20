@@ -2,6 +2,7 @@ from garlicconfig.exceptions import ValidationError
 from garlicconfig.utils import assert_value_type
 
 import six
+from six.moves import map
 
 
 cdef class ConfigField(object):
@@ -185,10 +186,10 @@ class ArrayField(ConfigField):
             self.field.validate(item)
 
     def to_model_value(self, value):
-        return map(self.field.to_model_value, value) if value else None
+        return list(map(self.field.to_model_value, value)) if value else None
 
     def to_garlic_value(self, value):
-        return map(self.field.to_garlic_value, value) if value else None
+        return list(map(self.field.to_garlic_value, value)) if value else None
 
     def __extra_desc__(self):
         return {
