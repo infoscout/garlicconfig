@@ -87,7 +87,7 @@ jobs:
             PYTHON_PATH: /opt/python/cp37-cp37m/bin
         <<: *test-suite-linux-template
 
-    test-mac-py27:
+    test-mac-py27: &test-mac-template
         macos:
           xcode: "10.0.0"
         environment:
@@ -111,7 +111,7 @@ jobs:
     test-mac-py37:
         environment:
             PYTHON_BIN: python3
-        <<: *test-mac-py27
+        <<: *test-mac-template
 
 workflows:
     version: 2
