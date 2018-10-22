@@ -93,7 +93,7 @@ jobs:
         steps:
         - run:
             name: "Install Development Tools"
-            command: "pip install cmake cget"
+            command: "pip install cmake cget Cython"
         - checkout
         - restore_cache: *restore_cache
         - run: *install_dependencies
