@@ -113,4 +113,5 @@ workflows:
             - test-linux-py35m
             - test-linux-py36m
             - test-linux-py37m
+            - test-mac
             - lint-checks
