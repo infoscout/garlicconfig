@@ -87,14 +87,42 @@ jobs:
             PYTHON_PATH: /opt/python/cp37-cp37m/bin
         <<: *test-suite-linux-template
 
+    test-mac-py27: &test-mac-template
+        macos:
+          xcode: "10.0.0"
+        environment:
+            PYTHON_BIN: python
+        steps:
+            - checkout
+            - run:
+                name: "Create Virtual Environment"
+                command: |
+                    virtualenv -p $PYTHON_BIN venv
+                    echo source $(pwd)/venv/bin/activate >> $BASH_ENV
+                    echo 'export PYTHON_PATH=$(pwd)/venv/bin' >> $BASH_ENV
+            - run:
+                name: "Install Development Tools"
+                command: pip install -r requirements.txt
+            - restore_cache: *restore_cache
+            - run: *install_dependencies
+            - save_cache: *save_cache
+            - run: *run-test-with-coverage
+
+    test-mac-py37:
+        environment:
+            PYTHON_BIN: python3
+        <<: *test-mac-template
+
 workflows:
     version: 2
     pr-checks:
         jobs:
+            - lint-checks
             - test-linux-py27m
             - test-linux-py27mu
             - test-linux-py34m
             - test-linux-py35m
             - test-linux-py36m
             - test-linux-py37m
-            - lint-checks
+            - test-mac-py27
+            - test-mac-py37

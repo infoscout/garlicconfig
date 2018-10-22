@@ -10,6 +10,7 @@ cget
 wheelhouse
 
 
+# GarlicConfig Generated C++ files.
 garlicconfig/encoding.cpp
 garlicconfig/exceptions.cpp
 garlicconfig/fields.cpp
