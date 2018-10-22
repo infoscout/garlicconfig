@@ -95,18 +95,18 @@ jobs:
         steps:
             - checkout
             - run:
-                name: "Install Development Tools"
+                name: "Create Virtual Environment"
                 command: |
                     virtualenv -p $PYTHON_BIN venv
-                    source ./venv/bin/activate
-                    pip install -r requirements.txt
+                    echo source $(pwd)/venv/bin/activate >> $BASH_ENV
+                    echo 'export PYTHON_PATH=$(pwd)/venv/bin' >> $BASH_ENV
+            -run:
+                name: "Install Development Tools"
+                command: pip install -r requirements.txt
             - restore_cache: *restore_cache
             - run: *install_dependencies
             - save_cache: *save_cache
-            - run:
-                environment:
-                    PYTHON_PATH: /Users/distiller/project/venv/bin
-                <<: *run-test-with-coverage
+            - run: *run-test-with-coverage
 
     test-mac-py37:
         environment:
