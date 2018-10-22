@@ -100,7 +100,7 @@ jobs:
         - save_cache: *save_cache
         - run:
             environment:
-                PYTHON_PATH: /usr/bin/python
+                PYTHON_PATH: /usr/bin
             <<: *run-test-with-coverage
 
 workflows:
