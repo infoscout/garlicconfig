@@ -93,20 +93,20 @@ jobs:
         environment:
             PYTHON_BIN: python
         steps:
-        - run:
-            name: "Install Development Tools"
-            command: |
-                virtualenv -p $PYTHON_BIN venv
-                source ./venv/bin/activate
-                pip install -r requirements.txt
-        - checkout
-        - restore_cache: *restore_cache
-        - run: *install_dependencies
-        - save_cache: *save_cache
-        - run:
-            environment:
-                PYTHON_PATH: /Users/distiller/project/venv/bin
-            <<: *run-test-with-coverage
+            - run:
+                name: "Install Development Tools"
+                command: |
+                    virtualenv -p $PYTHON_BIN venv
+                    source ./venv/bin/activate
+                    pip install -r requirements.txt
+            - checkout
+            - restore_cache: *restore_cache
+            - run: *install_dependencies
+            - save_cache: *save_cache
+            - run:
+                environment:
+                    PYTHON_PATH: /Users/distiller/project/venv/bin
+                <<: *run-test-with-coverage
 
     test-mac-py37:
         environment:
