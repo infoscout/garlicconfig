@@ -87,6 +87,22 @@ jobs:
             PYTHON_PATH: /opt/python/cp37-cp37m/bin
         <<: *test-suite-linux-template
 
+    test-mac:
+        macos:
+          xcode: "10.0.0"
+        steps:
+        - run:
+            name: "Install Development Tools"
+            command: "pip install cmake cget"
+        - checkout
+        - restore_cache: *restore_cache
+        - run: *install_dependencies
+        - save_cache: *save_cache
+        - run:
+            environment:
+                PYTHON_PATH: /usr/local/bin/python
+            <<: *run-test-with-coverage
+
 workflows:
     version: 2
     pr-checks:

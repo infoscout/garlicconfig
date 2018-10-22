@@ -7,7 +7,7 @@ common_params = dict(
     language='c++',
     include_dirs=['cget/include'],
     library_dirs=['cget/lib', 'cget/lib64'],
-    libraries=['GarlicConfig'],
+    libraries=['GarlicConfig', 'boost_filesystem', 'boost_system'],
     extra_compile_args=['-std=c++11']
 )
 
