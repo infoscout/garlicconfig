@@ -87,21 +87,31 @@ jobs:
             PYTHON_PATH: /opt/python/cp37-cp37m/bin
         <<: *test-suite-linux-template
 
-    test-mac:
+    test-mac-py27:
         macos:
           xcode: "10.0.0"
+        environment:
+            PYTHON_BIN: python
         steps:
         - run:
             name: "Install Development Tools"
-            command: "pip install cmake cget Cython"
+            command: |
+                virtualenv -p $PYTHON_BIN venv
+                source ./venv/bin/activate
+                pip install -r requirements.txt
         - checkout
         - restore_cache: *restore_cache
         - run: *install_dependencies
         - save_cache: *save_cache
         - run:
             environment:
-                PYTHON_PATH: /usr/bin
+                PYTHON_PATH: /Users/distiller/project/venv/bin
             <<: *run-test-with-coverage
+
+    test-mac-py37:
+        environment:
+            PYTHON_BIN: python3
+        <<: *test-mac-py27
 
 workflows:
     version: 2
@@ -113,5 +123,6 @@ workflows:
             - test-linux-py35m
             - test-linux-py36m
             - test-linux-py37m
-            - test-mac
+            - test-mac-py27
+            - test-mac-py37
             - lint-checks
