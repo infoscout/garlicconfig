@@ -100,7 +100,7 @@ jobs:
                     virtualenv -p $PYTHON_BIN venv
                     echo source $(pwd)/venv/bin/activate >> $BASH_ENV
                     echo 'export PYTHON_PATH=$(pwd)/venv/bin' >> $BASH_ENV
-            -run:
+            - run:
                 name: "Install Development Tools"
                 command: pip install -r requirements.txt
             - restore_cache: *restore_cache
