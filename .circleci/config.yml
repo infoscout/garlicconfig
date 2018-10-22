@@ -117,6 +117,7 @@ workflows:
     version: 2
     pr-checks:
         jobs:
+            - lint-checks
             - test-linux-py27m
             - test-linux-py27mu
             - test-linux-py34m
@@ -125,4 +126,3 @@ workflows:
             - test-linux-py37m
             - test-mac-py27
             - test-mac-py37
-            - lint-checks
