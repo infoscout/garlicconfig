@@ -120,7 +120,7 @@ jobs:
                     PYTHON_PATH: /opt/python/cp37-cp37m/bin
                 command: |
                     $PYTHON_PATH/pip install twine
-                    $PYTHON_PATH/twine --repository-url https://test.pypi.org/legacy/ upload wheelhouse/*
+                    $PYTHON_PATH/twine upload --repository-url https://test.pypi.org/legacy/ wheelhouse/*
 
     test-mac-py27: &test-mac-template
         macos:
@@ -161,7 +161,7 @@ jobs:
                 name: 'Twine :: Upload to PyPI'
                 command: |
                     $PYTHON_PATH/pip install twine
-                    $PYTHON_PATH/twine --repository-url https://test.pypi.org/legacy/ upload dist/*
+                    $PYTHON_PATH/twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
     dist-mac-py37:
         <<: *dist-mac-template
@@ -181,9 +181,17 @@ workflows:
             - test-linux-py37m
             - test-mac-py27
             - test-mac-py37
-    tags:
+    dist:
         jobs:
-            - lint-checks
-            - dist-linux
-            - dist-mac-py27
-            - dist-mac-py37
+            - dist-linux:
+                filters:
+                    tags:
+                        only: /.*/
+            - dist-mac-py27:
+                filters:
+                    tags:
+                        only: /.*/
+            - dist-mac-py37:
+                filters:
+                    tags:
+                        only: /.*/
