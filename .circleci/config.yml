@@ -35,6 +35,21 @@ aliases:
             - save_cache: *save_cache
             - run: *update_ld_library_path
             - run: *run-test-with-coverage
+    - &mac-create-virtualenv
+        name: "Create Virtual Environment"
+        command: |
+            virtualenv -p $PYTHON_BIN venv
+            echo source $(pwd)/venv/bin/activate >> $BASH_ENV
+            echo 'export PYTHON_PATH=$(pwd)/venv/bin' >> $BASH_ENV
+    - &mac-install-requirements
+        name: "Install Development Tools"
+        command: pip install -r requirements.txt
+    - &create-pypi-auth
+        name: 'Add PyPI Authentication File'
+        command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
 
 jobs:
     lint-checks:
@@ -87,6 +102,26 @@ jobs:
             PYTHON_PATH: /opt/python/cp37-cp37m/bin
         <<: *test-suite-linux-template
 
+    dist-linux:
+        docker:
+            - image: peymanmo/many_x64
+        steps:
+            - checkout
+            - restore_cache: *restore_cache
+            - run: *install_dependencies
+            - save_cache: *save_cache
+            - run:
+                name: 'Build Wheel Packages'
+                command: ./.circleci/dist-linux.sh
+            - run: *create-pypi-auth
+            - run:
+                name: 'Twine :: Upload to PyPI'
+                environment:
+                    PYTHON_PATH: /opt/python/cp37-cp37m/bin
+                command: |
+                    $PYTHON_PATH/pip install twine
+                    $PYTHON_PATH/twine --repository-url https://test.pypi.org/legacy/ upload wheelhouse/*
+
     test-mac-py27: &test-mac-template
         macos:
           xcode: "10.0.0"
@@ -94,24 +129,44 @@ jobs:
             PYTHON_BIN: python
         steps:
             - checkout
-            - run:
-                name: "Create Virtual Environment"
-                command: |
-                    virtualenv -p $PYTHON_BIN venv
-                    echo source $(pwd)/venv/bin/activate >> $BASH_ENV
-                    echo 'export PYTHON_PATH=$(pwd)/venv/bin' >> $BASH_ENV
-            - run:
-                name: "Install Development Tools"
-                command: pip install -r requirements.txt
+            - run: *mac-create-virtualenv
+            - run: *mac-install-requirements
             - restore_cache: *restore_cache
             - run: *install_dependencies
             - save_cache: *save_cache
             - run: *run-test-with-coverage
 
     test-mac-py37:
+        <<: *test-mac-template
         environment:
             PYTHON_BIN: python3
-        <<: *test-mac-template
+
+    dist-mac-py27: &dist-mac-template
+        macos:
+          xcode: "10.0.0"
+        environment:
+            PYTHON_BIN: python
+        steps:
+            - checkout
+            - run: *mac-create-virtualenv
+            - run: *mac-install-requirements
+            - restore_cache: *restore_cache
+            - run: *install_dependencies
+            - save_cache: *save_cache
+            - run:
+                name: 'Build Wheel Package'
+                command: $PYTHON_PATH/python setup.py bdist_wheel
+            - run: *create-pypi-auth
+            - run:
+                name: 'Twine :: Upload to PyPI'
+                command: |
+                    $PYTHON_PATH/pip install twine
+                    $PYTHON_PATH/twine --repository-url https://test.pypi.org/legacy/ upload dist/*
+
+    dist-mac-py37:
+        <<: *dist-mac-template
+        environment:
+            PYTHON_BIN: python3
 
 workflows:
     version: 2
@@ -126,3 +181,9 @@ workflows:
             - test-linux-py37m
             - test-mac-py27
             - test-mac-py37
+    tags:
+        jobs:
+            - lint-checks
+            - dist-linux
+            - dist-mac-py27
+            - dist-mac-py37
