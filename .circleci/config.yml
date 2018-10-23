@@ -44,12 +44,6 @@ aliases:
     - &mac-install-requirements
         name: "Install Development Tools"
         command: pip install -r requirements.txt
-    - &create-pypi-auth
-        name: 'Add PyPI Authentication File'
-        command: |
-            echo -e "[pypi]" >> ~/.pypirc
-            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
-            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
 
 jobs:
     lint-checks:
@@ -113,14 +107,13 @@ jobs:
             - run:
                 name: 'Build Wheel Packages'
                 command: ./.circleci/dist-linux.sh
-            - run: *create-pypi-auth
             - run:
                 name: 'Twine :: Upload to PyPI'
                 environment:
                     PYTHON_PATH: /opt/python/cp37-cp37m/bin
                 command: |
                     $PYTHON_PATH/pip install twine
-                    $PYTHON_PATH/twine upload --repository-url https://test.pypi.org/legacy/ wheelhouse/*
+                    $PYTHON_PATH/twine upload wheelhouse/*
 
     test-mac-py27: &test-mac-template
         macos:
@@ -156,12 +149,11 @@ jobs:
             - run:
                 name: 'Build Wheel Package'
                 command: $PYTHON_PATH/python setup.py bdist_wheel
-            - run: *create-pypi-auth
             - run:
                 name: 'Twine :: Upload to PyPI'
                 command: |
                     $PYTHON_PATH/pip install twine
-                    $PYTHON_PATH/twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+                    $PYTHON_PATH/twine upload dist/*
 
     dist-mac-py37:
         <<: *dist-mac-template
