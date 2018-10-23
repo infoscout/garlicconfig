@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import json
 from abc import ABCMeta, abstractmethod
 
@@ -9,15 +6,24 @@ from garlicconfig.models import ConfigModel
 import six
 
 
+cdef class Decoder(object):
+
+    def __dealloc__(self):
+        if self.native_decoder:
+            del self.native_decoder
+
+
+cdef class JsonDecoder(Decoder):
+
+    def __init__(self):
+        self.native_decoder = self.json_decoder = new NativeJsonDecoder()
+
+
 @six.add_metaclass(ABCMeta)
 class ConfigEncoder(object):
 
     @abstractmethod
     def encode(self, config, pretty=True):
-        pass
-
-    @abstractmethod
-    def decode(self, data, config_class):
         pass
 
 
@@ -77,15 +83,9 @@ class JsonEncoder(ConfigEncoder):
         if not isinstance(config, ConfigModel):
             raise TypeError("'config' must be a ConfigModel.")
         if pretty:
-            return json.dumps(config.get_dict(), sort_keys=True, indent=2, cls=PrettyJSONEncoder)
+            return json.dumps(config.py_value(), sort_keys=True, indent=2, cls=PrettyJSONEncoder)
         else:
-            return json.dumps(config.get_dict(), sort_keys=True, separators=(',', ':'))
-
-    def decode(self, data, config_class):
-        if not issubclass(config_class, ConfigModel):
-            raise TypeError("'config_class' must be a ConfigModel.")
-        data_dict = json.loads(data)
-        return config_class.load_dict(data_dict)
+            return json.dumps(config.py_value(), sort_keys=True, separators=(',', ':'))
 
 
 def encode(config, cls=None, pretty=True):
@@ -101,17 +101,3 @@ def encode(config, cls=None, pretty=True):
     if not issubclass(cls, ConfigEncoder):
         raise TypeError("'cls' must be a ConfigEncoder")
     return cls().encode(config, pretty)
-
-
-def decode(data, config_class, cls=None):
-    """
-    Decodes the raw data using a decoder to a config instance.
-    :param data: The raw data to be processed by the encoder.
-    :param config_class: The config model class, to be used as a model for validation.
-    :type config_class: ConfigModel
-    :param cls: The encoder class. Must be of type ConfigEncoder.
-    """
-    cls = cls or JsonEncoder
-    if not issubclass(cls, ConfigEncoder):
-        raise TypeError("'cls' must be a ConfigEncoder")
-    return cls().decode(data, config_class)

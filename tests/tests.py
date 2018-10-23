@@ -2,61 +2,26 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import copy
 import json
 import os
 import shutil
 import unittest
 
-from garlicconfig import encoder
+from garlicconfig import encoding
 from garlicconfig.exceptions import ConfigNotFound, ValidationError
-from garlicconfig.fields import ArrayField, BooleanField, ConfigField, IntegerField, StringField
-from garlicconfig.fields.model import ModelField
-from garlicconfig.models import ConfigModel
+from garlicconfig.fields import ArrayField, BooleanField, IntegerField, StringField
+from garlicconfig.models import ConfigModel, ModelField
 from garlicconfig.repositories import FileConfigRepository, MemoryConfigRepository
-from garlicconfig.utils import merge
 
 
 class TestConfigFields(unittest.TestCase):
-
-    def test_base(self):
-        """
-        Test ConfigField to make sure it behaves correctly.
-        This is the only place we should test __validate__, other tests should use Model.validate instead.
-        """
-        test_field = ConfigField()
-        self.assertEqual(test_field.default, None)
-        self.assertEqual(test_field.nullable, True)
-
-        ConfigField(default=25, nullable=False)  # should not raise
-        ConfigField(default=None, nullable=True)  # should not raise
-        with self.assertRaises(ValidationError):
-            ConfigField(default=None, nullable=False)  # can't set an invalid default value.
-
-        # to make sure field's validate gets called properly
-        class SomeField(ConfigField):
-            def validate(self, value):
-                if value != 25:
-                    raise ValueError()
-
-        test_field = SomeField(default=None, nullable=True)  # shouldn't raise cause it's null and it's permitted.
-        test_field.__validate__(None)  # shouldn't raise because of the same reason
-        test_field.__validate__(25)  # shouldn't raise because SomeFields's validate method doesn't raise.
-        with self.assertRaises(ValueError):
-            test_field.__validate__(20)  # bad value; should raise because SomeField's validate method raises Exception
-
-        with self.assertRaises(ValueError):
-            test_field.__validate__(24)  # bad default value; should raise
-
-        SomeField(default=25, nullable=False)  # shouldn't raise
 
     def test_string(self):
         # test null and default
         test_field = StringField(default=None, nullable=True)
         test_field.validate('test string')  # make sure it doesn't raise
 
-        with self.assertRaises(ValidationError):
-            StringField(default=None, nullable=False)
+        StringField(default=None, nullable=False)
 
         with self.assertRaises(ValidationError):
             StringField(default=25, nullable=False)
@@ -77,6 +42,7 @@ class TestConfigFields(unittest.TestCase):
 
     def test_int(self):
         test_field = IntegerField(default=0, nullable=False)  # make sure we don't confuse 0 with None
+        test_field.validate(0)
         test_field.validate(-1)
         with self.assertRaises(ValidationError):
             test_field.validate('Rick Sanchez')
@@ -126,8 +92,8 @@ class TestConfigFields(unittest.TestCase):
         self.assertEqual(test_model.name, 'Mark Rothko')
         test_field.to_model_value({})
         test_model = test_field.to_model_value(None)
-        self.assertEqual(test_field.to_dict_value(None), None)
-        self.assertEqual(test_field.to_dict_value(test_model), None)
+        self.assertEqual(test_field.to_garlic_value(None), None)
+        self.assertEqual(test_field.to_garlic_value(test_model), None)
 
     def test_array(self):
         class Test(ConfigModel):
@@ -152,12 +118,12 @@ class TestConfigFields(unittest.TestCase):
         test_field = ArrayField(field=StringField(choices=('a', 'b'), nullable=True))
         self.assertEqual(test_field.to_model_value(['a', 'b']), ['a', 'b'])
         self.assertEqual(test_field.to_model_value(('a', 'b')), ['a', 'b'])
-        self.assertEqual(test_field.to_dict_value(['a', 'b']), ['a', 'b'])
+        self.assertEqual(test_field.to_garlic_value(['a', 'b']), ['a', 'b'])
 
         test_field = ArrayField(field=ModelField(model_class=Test))
-        dict_value = test_field.to_dict_value([
-            Test.load_dict({'age': 12}),
-            Test.load_dict({'age': 13})
+        dict_value = test_field.to_garlic_value([
+            Test.from_dict({'age': 12}),
+            Test.from_dict({'age': 13}),
         ])
         self.assertEqual(dict_value, [{'age': 12}, {'age': 13}])
 
@@ -183,14 +149,14 @@ class TestConfigModel(unittest.TestCase):
         test = self.ChildModel()
         test.age = 12
         test.occupation = 'zombie trainer'
-        self.assertEqual(test.get_dict(), {'age': 12, 'occupation': 'zombie trainer', 'working': True})
+        self.assertEqual(test.py_value(), {'age': 12, 'occupation': 'zombie trainer', 'working': True})
 
     def test_get_and_load(self):
         test = self.ChildModel()
         test.age = 12
-        self.assertEqual(test.get_dict(), {'age': 12, 'working': True})
+        self.assertEqual(test.py_value(), {'age': 12, 'working': True})
 
-        test = self.ChildModel.load_dict(
+        test = self.ChildModel.from_dict(
             {
                 'name': 'Jack Skellington',
                 'age': 24,
@@ -200,27 +166,27 @@ class TestConfigModel(unittest.TestCase):
         )
 
         # make sure we do instantiate a model object no matter what.
-        self.assertEqual(self.OptionalConfig.load_dict(None).get_dict(), self.OptionalConfig().get_dict())
+        self.assertEqual(self.OptionalConfig.from_dict(None).py_value(), self.OptionalConfig().py_value())
 
-        with self.assertRaises(ValidationError):
-            self.assertEqual(self.ChildModel.load_dict(None).get_dict(), self.ChildModel().get_dict())
+        self.assertEqual(self.ChildModel.from_dict(None).py_value(), self.ChildModel().py_value())
 
         self.assertEqual(test.age, 24)
         self.assertEqual(test.working, False)
         self.assertEqual(test.occupation, 'Head of Halloween Department')
         self.assertEqual(test.name, 'Jack Skellington')
 
+        child_config = self.ChildModel.from_dict(
+            {
+                'age': '25'
+            }
+        )
         with self.assertRaises(ValidationError):
-            self.ChildModel.load_dict(
-                {
-                    'age': '25'
-                }
-            )
+            child_config.validate()
 
-        with self.assertRaises(ValidationError):
-            self.ChildModel.load_dict({  # should raise ValidationError because age and working are not provided.
-                'occupation': 'peyman'
-            })
+        child_config = self.ChildModel.from_dict({
+            'occupation': 'peyman'
+        })
+        child_config.validate()
 
     def test_model_field(self):
         class BigConfig(ConfigModel):
@@ -229,7 +195,7 @@ class TestConfigModel(unittest.TestCase):
         test = BigConfig()
         test.info.name = 'Ms. Butterhead'
         test.info.working = False
-        self.assertEqual(test.get_dict(), {
+        self.assertEqual(test.py_value(), {
             'info': {
                 'age': 21,
                 'working': False,
@@ -237,7 +203,7 @@ class TestConfigModel(unittest.TestCase):
             }
         })
 
-        test = BigConfig.load_dict({
+        test = BigConfig.from_dict({
             'info': {
                 'age': 21,
                 'working': False,
@@ -249,14 +215,16 @@ class TestConfigModel(unittest.TestCase):
         self.assertEqual(test.info.name, 'Ms. Butterhead')
         self.assertEqual(test.info.occupation, None)
 
+        # Make sure we load the object properly even when it's invalid.
+        loaded_config = BigConfig.from_dict({
+            'info': {
+                'age': '21',  # make sure we properly raise ValidationError
+                'working': False,
+                'name': 'Ms. Butterhead'
+            }
+        })
         with self.assertRaises(ValidationError):
-            BigConfig.load_dict({
-                'info': {
-                    'age': '21',  # make sure we properly raise ValidationError
-                    'working': False,
-                    'name': 'Ms. Butterhead'
-                }
-            })
+            loaded_config.validate()
 
     def test_model_desc(self):
         class KidConfig(ConfigModel):
@@ -372,94 +340,28 @@ class TestEncoder(unittest.TestCase):
         test.name = 'Peyman'
         test.age = 21
         test.matrix = [[1, 2], [3, 4]]
-        encoded_data = encoder.encode(test, pretty=False)
+        encoded_data = encoding.encode(test, pretty=False)
         self.assertEqual(encoded_data, '{"age":21,"matrix":[[1,2],[3,4]],"name":"Peyman"}')
 
-        encoded_data = encoder.encode(test, pretty=True)
+        encoded_data = encoding.encode(test, pretty=True)
         self.assertEqual(
             encoded_data,
             '{\n  "age": 21,\n  "matrix": [\n    [1, 2],\n    [3, 4]\n  ],\n  "name": "Peyman"\n}'
         )
 
         with self.assertRaises(TypeError):
-            encoder.encode('some random string')
+            encoding.encode('some random string')
 
         with self.assertRaises(TypeError):
-            encoder.encode(test, cls=str)
-
-        # decode
-        with self.assertRaises(TypeError):
-            encoder.decode('{"age":21,"name":"Peyman"}', self.Test, cls=str)
-
-        test = encoder.decode('{"age":21,"name":"Peyman","numbers":[1,2,3,4]}', self.Test)
-        self.assertEqual(test.age, 21)
-        self.assertEqual(test.name, 'Peyman')
-        self.assertEqual(test.numbers, [1, 2, 3, 4])
-
-        with self.assertRaises(TypeError):
-            encoder.decode('{}', str)
-
-    def test_merge(self):
-        base = {
-            'name': 'Peyman',
-            'age': 21,
-            'settings': {
-                'version': 1,
-                'numbers': [1, 2, 3],
-                'tokens': {
-                    'a': 'a',
-                    'b': 'b',
-                }
-            }
-        }
-        config = {
-            'name': 'Patrick',
-            'nickname': 'Peymo',
-            'settings': {
-                'addedProperty': 'addedValue',
-                'numbers': [4, 5, 6],
-                'tokens': {
-                    'c': 'c',
-                    'b': 'd'
-                },
-                'vars': {
-                    'x': 12
-                }
-            }
-        }
-
-        base_copy = copy.deepcopy(base)
-        config_copy = copy.deepcopy(config)
-
-        expected_end_result = {
-            'name': 'Patrick',
-            'age': 21,
-            'nickname': 'Peymo',
-            'settings': {
-                'addedProperty': 'addedValue',
-                'numbers': [4, 5, 6],
-                'tokens': {
-                    'a': 'a',
-                    'b': 'd',
-                    'c': 'c'
-                },
-                'version': 1,
-                'vars': {
-                    'x': 12
-                }
-            }
-        }
-        self.assertEqual(merge(base, config), expected_end_result)
-        self.assertEqual(base_copy, base)  # make sure we didn't touch base
-        self.assertEqual(config_copy, config)  # make sure we didn't touch config
+            encoding.encode(test, cls=str)
 
 
 class TestMemoryConfigRepository(unittest.TestCase):
 
     def test_memory_repo(self):
         memory_repo = MemoryConfigRepository()
-        self.assertEqual(list(memory_repo.all()), [])
-        with self.assertRaises(ConfigNotFound):
+        self.assertEqual(list(memory_repo.list_configs()), [])
+        with self.assertRaises(Exception):
             memory_repo.retrieve('something')
 
         memory_repo.save('config1', 'data')
@@ -473,10 +375,10 @@ class TestFileConfigRepository(unittest.TestCase):
     def setUp(self):
         os.mkdir(self.TEST_DIR)
 
-    def test_memory_repo(self):
-        file_repo = FileConfigRepository(root_dir=self.TEST_DIR)
-        self.assertEqual(list(file_repo.all()), [])
-        with self.assertRaises(ConfigNotFound):
+    def test_file_repo(self):
+        file_repo = FileConfigRepository(root_path=self.TEST_DIR)
+        self.assertEqual(list(file_repo.list_configs()), [])
+        with self.assertRaises(Exception):
             file_repo.retrieve('something')
 
         file_repo.save('config1', 'data')
@@ -485,7 +387,7 @@ class TestFileConfigRepository(unittest.TestCase):
         with open(os.path.join(self.TEST_DIR, '.DS_Store'), 'w') as f:
             f.write('something')
 
-        self.assertEqual(set(file_repo.all()), {'config1'})
+        self.assertEqual(set(file_repo.list_configs()), {'config1'})
 
     def tearDown(self):
         shutil.rmtree(self.TEST_DIR)

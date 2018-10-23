@@ -1,7 +1,33 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from setuptools import find_packages, setup
+from setuptools.extension import Extension
+from Cython.Build import cythonize
+
+
+common_params = dict(
+    language='c++',
+    include_dirs=['cget/include'],
+    library_dirs=['cget/lib', 'cget/lib64'],
+    libraries=['GarlicConfig', 'boost_filesystem', 'boost_system'],
+    extra_compile_args=['-std=c++11']
+)
+
+
+def create_extension(name):
+    return Extension(
+        name='garlicconfig.{name}'.format(name=name),
+        sources=['garlicconfig/{name}.pyx'.format(name=name)],
+        **common_params
+    )
+
+
+ext_modules = [
+    create_extension('exceptions'),
+    create_extension('repositories'),
+    create_extension('layer'),
+    create_extension('encoding'),
+    create_extension('fields'),
+    create_extension('models'),
+]
 
 with open('VERSION', 'r') as reader:
     version = reader.read().strip()
@@ -25,5 +51,7 @@ setup(
     download_url='https://github.com/infoscout/garlicconfig/archive/{version}.tar.gz'.format(version=version),
     version=version,
     install_requires=['six'],
-    keywords=['configs', 'settings']
+    keywords=['configs', 'settings'],
+    ext_modules=cythonize(ext_modules),
+    zip_safe=False
 )

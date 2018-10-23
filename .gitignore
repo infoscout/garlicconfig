@@ -6,3 +6,14 @@ garlicconfig.egg-info
 .idea
 build
 dist
+cget
+wheelhouse
+
+
+# GarlicConfig Generated C++ files.
+garlicconfig/encoding.cpp
+garlicconfig/exceptions.cpp
+garlicconfig/fields.cpp
+garlicconfig/layer.cpp
+garlicconfig/models.cpp
+garlicconfig/repositories.cpp
