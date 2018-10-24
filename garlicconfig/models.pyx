@@ -28,7 +28,7 @@ class ModelMetaClass(type):
                 if not field.friendly_name:
                     field.friendly_name = key
                 meta.fields[key] = field
-                setattr(new_class, key, copy.deepcopy(field.default) if field.default is not None else None)
+                setattr(new_class, key, field.default)
         for base in bases:
             if isinstance(base, ModelMetaClass):
                 meta.fields.update(base.__meta__.fields)
@@ -38,6 +38,12 @@ class ModelMetaClass(type):
 
 @six.add_metaclass(ModelMetaClass)
 class ConfigModel(object):
+
+    def __init__(self):
+        for field_name in self.__meta__.fields:
+            value = getattr(self, field_name)
+            if value is not None:
+                setattr(self, field_name, copy.deepcopy(value))
 
     @classmethod
     def from_garlic(cls, GarlicValue garlic_value):
