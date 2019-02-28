@@ -1,12 +1,10 @@
 import copy
 
-from cython.operator cimport dereference as deref
-from libcpp.memory cimport shared_ptr
 import six
 
 from garlicconfig.exceptions import ValidationError
-from garlicconfig.fields cimport ConfigField
-from garlicconfig.layer cimport GarlicValue, ObjectValue, LayerValue
+from garlicconfig.layer import GarlicValue
+from garlicconfig.fields import ConfigField, validate_model_fields
 from garlicconfig.utils import assert_value_type
 
 
@@ -46,20 +44,18 @@ class ConfigModel(object):
                 setattr(self, field_name, copy.deepcopy(value))
 
     @classmethod
-    def from_garlic(cls, GarlicValue garlic_value):
+    def from_garlic(cls, garlic_value):
         """
         Instantiate a config model and load it using the given GarlicValue.
         """
         return cls.from_dict(garlic_value.py_value())
 
     @classmethod
-    def from_dict(cls, dict value):
+    def from_dict(cls, value):
         """
         Instantiate a config model and load it using the given dict.
         """
         new_instance = cls()
-        cdef str key
-        cdef ConfigField field
         if value:
             for key, field in six.iteritems(cls.__meta__.fields):
                 try:
@@ -73,17 +69,15 @@ class ConfigModel(object):
         """
         Returns a python dictionary containing description for the current model and its children.
         """
-        cdef dict obj = {}
-        cdef str key
-        cdef ConfigField field
+        obj = {}
         for key, field in six.iteritems(cls.__meta__.fields):
             obj[key] = field.get_field_desc_dict()
         return obj
 
     @classmethod
-    def resolve_field(cls, str path):
-        cdef list parts = path.split('.')
-        cdef ConfigField current_field = None
+    def resolve_field(cls, path):
+        parts = path.split('.')
+        current_field = None
         current_model = cls
         for part in parts:
             try:
@@ -100,21 +94,13 @@ class ConfigModel(object):
         """
         Returns an instance of GarlicValue representing this model.
         """
-        cdef ObjectValue* obj = new ObjectValue()
-        cdef str key
-        cdef ConfigField field
-        for key, field in six.iteritems(self.__meta__.fields):
-            model_value = getattr(self, key)
-            garlic_value = field.to_garlic_value(model_value)
-            if garlic_value is not None:
-                deref(obj).set(key, GarlicValue.init_layer_value(garlic_value))
-        return GarlicValue.native_load(shared_ptr[LayerValue](obj))
+        return GarlicValue.init_layer_value(self.py_value())
 
     def py_value(self):
         """
         Returns an instance of python dictionary containing only basic types so it can be used for encoding.
         """
-        cdef dict obj = {}
+        obj = {}
         for key, field in six.iteritems(self.__meta__.fields):
             dict_value = field.to_garlic_value(getattr(self, key))
             if dict_value is not None:
@@ -125,10 +111,7 @@ class ConfigModel(object):
         """
         Validates the current model.
         """
-        cdef str key
-        cdef ConfigField field
-        for key, field in six.iteritems(self.__meta__.fields):
-            field.native_validate(getattr(self, key), True)
+        validate_model_fields(self)
 
 
 class ModelField(ConfigField):

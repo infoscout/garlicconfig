@@ -26,7 +26,6 @@ ext_modules = [
     create_extension('layer'),
     create_extension('encoding'),
     create_extension('fields'),
-    create_extension('models'),
 ]
 
 with open('VERSION', 'r') as reader:
