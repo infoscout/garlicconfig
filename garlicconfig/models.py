@@ -1,8 +1,8 @@
 import copy
 
 from garlicconfig.exceptions import ValidationError
+from garlicconfig.fields import ConfigField, validate_model_fields
 from garlicconfig.layer import GarlicValue
-from garlicconfig.fields import validate_model_fields, ConfigField
 from garlicconfig.utils import assert_value_type
 
 import six
