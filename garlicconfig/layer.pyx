@@ -86,7 +86,7 @@ cdef class GarlicValue(object):
     def py_value(self):
         return GarlicValue.map_value(self.native_value)
 
-    def resolve(self, str path):
+    def resolve(self, path):
         cdef const shared_ptr[LayerValue]* result = &deref(self.native_value).resolve(path.encode('utf-8'))
         if deref(result) != NotFoundPtr:
             return GarlicValue.map_value(deref(result))
