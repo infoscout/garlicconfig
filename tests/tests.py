@@ -141,6 +141,39 @@ class TestConfigModel(unittest.TestCase):
     class OptionalConfig(ConfigModel):
         name = StringField()
 
+    def test_resolve_field(self):
+        class NestedExample(ConfigModel):
+            parent = ModelField(self.ParentModel)
+
+        class EvenMoreNestedExample(ConfigModel):
+            grand_parent = ModelField(NestedExample)
+
+        self.assertEqual(type(self.ParentModel.resolve_field('name')), StringField)
+        self.assertEqual(type(EvenMoreNestedExample.resolve_field('grand_parent.parent.name')), StringField)
+        self.assertEqual(type(EvenMoreNestedExample.resolve_field('grand_parent')), ModelField)
+        self.assertIsNone(EvenMoreNestedExample.resolve_field(''))
+        self.assertIsNone(EvenMoreNestedExample.resolve_field('blah blah'))
+
+    def test_get_garlic_value(self):
+        class SomeConfig(ConfigModel):
+            info = ModelField(model_class=self.ChildModel)
+            name = StringField()
+
+        my_config = SomeConfig()
+        my_config.name = "Peyman"
+        my_config.info.working = True
+        my_config.info.occupation = 'Garlic Engineer'
+        g_value = my_config.garlic_value()
+        self.assertEqual(g_value.resolve('name'), 'Peyman')
+        self.assertEqual(g_value.resolve('info.working'), True)
+        self.assertEqual(g_value.resolve('info.occupation'), 'Garlic Engineer')
+        self.assertEqual(g_value.resolve('info'), {'working': True, 'occupation': 'Garlic Engineer', 'age': 21})
+        self.assertIsNone(g_value.resolve('something.that.does.not.exist'))
+        self.assertIsNone(g_value.resolve(''))
+        self.assertIsNone(g_value.resolve('test'))
+        another_config = SomeConfig.from_garlic(g_value)
+        self.assertEqual(another_config.py_value(), my_config.py_value())
+
     def test_inheritance(self):
         self.assertEqual(set(self.ParentModel.__meta__.fields), {'age', 'name'})
         self.assertEqual(set(self.ChildModel.__meta__.fields), {'age', 'name', 'working', 'occupation'})

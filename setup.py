@@ -7,7 +7,7 @@ common_params = dict(
     language='c++',
     include_dirs=['cget/include'],
     library_dirs=['cget/lib', 'cget/lib64'],
-    libraries=['GarlicConfig', 'boost_filesystem', 'boost_system'],
+    libraries=['GarlicConfig'],
     extra_compile_args=['-std=c++11']
 )
 
@@ -26,7 +26,6 @@ ext_modules = [
     create_extension('layer'),
     create_extension('encoding'),
     create_extension('fields'),
-    create_extension('models'),
 ]
 
 with open('VERSION', 'r') as reader:
