@@ -94,7 +94,7 @@ class ConfigModel(object):
         """
         Returns an instance of GarlicValue representing this model.
         """
-        return GarlicValue.init_layer_value(self.py_value())
+        return GarlicValue(self.py_value())
 
     def py_value(self):
         """

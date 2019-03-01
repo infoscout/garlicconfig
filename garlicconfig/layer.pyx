@@ -27,18 +27,18 @@ cdef class GarlicValue(object):
     cdef shared_ptr[LayerValue] init_layer_value(object value) except +:
         cdef ObjectValue* object_value = NULL
         cdef ListValue* list_value = NULL
-        if isinstance(value, int):
+        if isinstance(value, bool):
+            return shared_ptr[LayerValue](new BoolValue(value))
+        elif isinstance(value, int):
             return shared_ptr[LayerValue](new IntegerValue(value))
         elif isinstance(value, float):
             return shared_ptr[LayerValue](new DoubleValue(value))
         elif isinstance(value, available_str):
-            return shared_ptr[LayerValue](new StringValue(value))
-        elif isinstance(value, bool):
-            return shared_ptr[LayerValue](new BoolValue(value))
+            return shared_ptr[LayerValue](new StringValue(value.encode('utf-8')))
         elif isinstance(value, dict):
             object_value = new ObjectValue()
             for key in value:
-                deref(object_value).set(key, GarlicValue.init_layer_value(value[key]))
+                deref(object_value).set(key.encode('utf-8'), GarlicValue.init_layer_value(value[key]))
             return shared_ptr[LayerValue](object_value)
         elif isinstance(value, Iterable):
             list_value = new ListValue()
@@ -86,8 +86,8 @@ cdef class GarlicValue(object):
     def py_value(self):
         return GarlicValue.map_value(self.native_value)
 
-    def resolve(self, const string& path):
-        cdef const shared_ptr[LayerValue]* result = &deref(self.native_value).resolve(path)
+    def resolve(self, str path):
+        cdef const shared_ptr[LayerValue]* result = &deref(self.native_value).resolve(path.encode('utf-8'))
         if deref(result) != NotFoundPtr:
             return GarlicValue.map_value(deref(result))
 
