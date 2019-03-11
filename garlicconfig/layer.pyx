@@ -115,5 +115,5 @@ cdef class LayerRetriever(object):
         self.decoder = decoder or JsonDecoder()
         self.repo = repository
 
-    def retrieve(self, const string& name):
-        return GarlicValue.native_load(load_value(self.repo.native_repo, self.decoder.native_decoder, name))
+    def retrieve(self, str name):
+        return GarlicValue.native_load(load_value(self.repo.native_repo, self.decoder.native_decoder, name.encode('utf-8')))
