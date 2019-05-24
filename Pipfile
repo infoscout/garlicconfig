@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-Cython = ""
-cget = ""
-cmake = ""
+Cython = "*"
+cget = "*"
+cmake = "*"
 
 [dev-packages]
 
