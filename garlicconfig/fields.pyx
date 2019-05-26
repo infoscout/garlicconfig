@@ -5,7 +5,7 @@ import six
 from six.moves import map
 
 
-def validate_model_fields(model):
+cpdef validate_model_fields(model):
     cdef ConfigField field
     cdef str key
     for key, field in six.iteritems(model.__meta__.fields):
