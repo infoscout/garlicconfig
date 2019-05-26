@@ -4,6 +4,7 @@
 htmlcov
 garlicconfig.egg-info
 .idea
+.vscode
 build
 dist
 cget

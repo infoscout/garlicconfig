@@ -1,1 +1,1 @@
-infoscout/garlicconfig-core@1.0.2
+infoscout/garlicconfig-core@1.0.3
