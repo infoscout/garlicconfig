@@ -24,4 +24,4 @@ cdef extern from "error_handling_utility.cpp":
 
 cdef int raise_py_error() except *:
     cdef vector[string] ex_info = get_native_error()
-    raise error_map[ex_info[0]](ex_info[1])
+    raise error_map[ex_info[0].decode('utf-8')](ex_info[1].decode('utf-8'))

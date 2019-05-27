@@ -71,7 +71,7 @@ cdef class GarlicValue(object):
     @staticmethod
     cdef map_value(const shared_ptr[LayerValue]& value):
         if deref(value).is_string():
-            return deref(value).get_string().decode("utf-8")
+            return deref(value).get_string().decode('utf-8')
         elif deref(value).is_bool():
             return deref(value).get_bool()
         elif deref(value).is_int():
