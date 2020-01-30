@@ -163,7 +163,7 @@ jobs:
         environment:
             PYTHON_BIN: python3
 
-    test-win32-py37-x64:
+    test-win32-py37-x64: &test-win32-x64
         executor: win/default
         environment:
             PYTHON_NAME: python
@@ -200,10 +200,29 @@ jobs:
                     cd tests
                     python tests.py
 
+    test-win32-py36-x64:
+        <<: *test-win32-x64
+        environment:
+            PYTHON_VERSION: 3.6.8
+
+    test-win32-py35-x64:
+        <<: *test-win32-x64
+        environment:
+            PYTHON_VERSION: 3.5.4
+
+    test-win32-py27-x64:
+        <<: *test-win32-x64
+        environment:
+            PYTHON_NAME: python2
+            PYTHON_VERSION: 2.7.17
+
 workflows:
     version: 2
     pr-checks:
         jobs:
+            - test-win32-py27-x64
+            - test-win32-py35-x64
+            - test-win32-py36-x64
             - test-win32-py37-x64
             #- lint-checks
             #- test-linux-py27m
