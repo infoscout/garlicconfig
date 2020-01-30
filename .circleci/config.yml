@@ -179,6 +179,7 @@ jobs:
                     .\python\tools\python.exe -m pip install virtualenv
                     .\python\tools\python.exe -m virtualenv garlic
                     .\garlic\Scripts\activate.ps1
+                    cd project
                     pip install -r requirements.txt
             - restore_cache:
                 keys:
