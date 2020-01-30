@@ -230,7 +230,9 @@ workflows:
     version: 2
     pr-checks:
         jobs:
-            - test-win32-py27-x64
+            - test-win32-py35-x86
+            - test-win32-py36-x86
+            - test-win32-py37-x86
             - test-win32-py35-x64
             - test-win32-py36-x64
             - test-win32-py37-x64
