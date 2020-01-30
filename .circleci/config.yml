@@ -177,7 +177,7 @@ jobs:
                     cd ~
                     nuget install $env:PYTHON_NAME -Version $env:PYTHON_VERSION -ExcludeVersion -OutputDirectory .
                     .\python\tools\python.exe -m pip install virtualenv
-                    .\python\tools\python.exe -m pip virtualenv garlic
+                    .\python\tools\python.exe -m virtualenv garlic
                     .\garlic\Scripts\activate.ps1
                     pip install -r requirements.txt
             - restore_cache:
