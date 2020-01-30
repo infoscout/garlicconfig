@@ -252,7 +252,7 @@ jobs:
                     ~\garlic\Scripts\activate.ps1
                     python setup.py bdist_wheel
                     pip install twine
-                    twine upload wheelhouse/*
+                    twine upload dist/*
 
     dist-win32-py36-x64:
         <<: *dist-win32-x64
@@ -286,7 +286,7 @@ jobs:
                     ~\garlic\Scripts\activate.ps1
                     python setup.py bdist_wheel
                     pip install twine
-                    twine upload wheelhouse/*
+                    twine upload dist/*
 
     dist-win32-py36-x86:
         <<: *dist-win32-x86
