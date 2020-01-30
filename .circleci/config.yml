@@ -163,7 +163,7 @@ jobs:
         environment:
             PYTHON_BIN: python3
 
-    test-win32-py37-x64: &test-win32
+    test-win32-py37-x64: &test-win32-x64
         executor: win/default
         environment:
             PYTHON_NAME: python
@@ -192,35 +192,46 @@ jobs:
                     python tests.py
 
     test-win32-py36-x64:
-        <<: *test-win32
+        <<: *test-win32-x64
         environment:
             PYTHON_NAME: python
             PYTHON_VERSION: 3.6.8
             ARCH: x64
 
     test-win32-py35-x64:
-        <<: *test-win32
+        <<: *test-win32-x64
         environment:
             PYTHON_NAME: python
             PYTHON_VERSION: 3.5.4
             ARCH: x64
 
-    test-win32-py37-x86:
-        <<: *test-win32
+    test-win32-py37-x86: &test-win32-x86
+        <<: *test-win32-x64
         environment:
             PYTHON_NAME: pythonx86
             PYTHON_VERSION: 3.7.5
             ARCH: x86
+        steps:
+            - checkout
+            - run: *install_win32_python
+            - restore_cache:
+                keys:
+                - cget-v2-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+            - run: *install_win32_native_libs
+            - save_cache:
+                    key: cget-v2-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+                    paths: ["cget"]
+            - run: *run_win32_tests
 
     test-win32-py36-x86:
-        <<: *test-win32
+        <<: *test-win32-x86
         environment:
             PYTHON_NAME: pythonx86
             PYTHON_VERSION: 3.6.8
             ARCH: x86
 
     test-win32-py35-x86:
-        <<: *test-win32
+        <<: *test-win32-x86
         environment:
             PYTHON_NAME: pythonx86
             PYTHON_VERSION: 3.5.4
