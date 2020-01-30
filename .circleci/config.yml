@@ -173,23 +173,13 @@ jobs:
             - checkout
             - run: &install_win32_python
                 name: "Install Python and Install Dependencies"
-                command: |
-                    cd ~
-                    nuget install $env:PYTHON_NAME -Version $env:PYTHON_VERSION -ExcludeVersion -OutputDirectory .
-                    .\$env:PYTHON_NAME\tools\python.exe -m pip install virtualenv
-                    .\$env:PYTHON_NAME\tools\python.exe -m virtualenv garlic
-                    .\garlic\Scripts\activate.ps1
-                    cd project
-                    pip install -r requirements.txt
+                command: .circleci\install_python.ps1
             - restore_cache:
                 keys:
                 - cget-v2-x64-{{ arch }}-{{ checksum "requirements.txt" }}
             - run: &install_win32_native_libs
                 name: "Resolve Native Dependencies x64"
-                command: |
-                    ~\garlic\Scripts\activate.ps1
-                    cget init --std=c++ --static
-                    cget install -DCMAKE_GENERATOR_PLATFORM=$env:ARCH --file=native_requirements.txt
+                command: .circleci\install_libs.ps1
             - save_cache:
                     key: cget-v2-x64-{{ arch }}-{{ checksum "requirements.txt" }}
                     paths: ["cget"]
