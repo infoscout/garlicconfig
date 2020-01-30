@@ -168,7 +168,6 @@ jobs:
         environment:
             PYTHON_NAME: python
             PYTHON_VERSION: 3.7.5
-            ARCH: x64
         steps:
             - checkout
             - run: &install_win32_python
@@ -184,12 +183,12 @@ jobs:
             - restore_cache:
                 keys:
                 - cget-v2-x64-{{ arch }}-{{ checksum "requirements.txt" }}
-            - run: &install_win32_native_libs
-                name: "Resolve Native Dependencies"
+            - run: &install_win32_x64_native_libs
+                name: "Resolve Native Dependencies x64"
                 command: |
                     ~\garlic\Scripts\activate.ps1
                     cget init --std=c++ --static
-                    cget install -DCMAKE_GENERATOR_PLATFORM=$env:ARCH --file=native_requirements.txt
+                    cget install -DCMAKE_GENERATOR_PLATFORM=x64 --file=native_requirements.txt
             - save_cache:
                     key: cget-v2-x64-{{ arch }}-{{ checksum "requirements.txt" }}
                     paths: ["cget"]
