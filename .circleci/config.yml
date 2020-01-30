@@ -176,12 +176,12 @@ jobs:
                 command: .circleci\install_python.ps1
             - restore_cache:
                 keys:
-                - cget-v2-x64-{{ arch }}-{{ checksum "requirements.txt" }}
+                - cget-v3-x64-{{ arch }}-{{ checksum "requirements.txt" }}
             - run: &install_win32_native_libs
                 name: "Resolve Native Dependencies x64"
                 command: .circleci\install_libs.ps1
             - save_cache:
-                    key: cget-v2-x64-{{ arch }}-{{ checksum "requirements.txt" }}
+                    key: cget-v3-x64-{{ arch }}-{{ checksum "requirements.txt" }}
                     paths: ["cget"]
             - run: &run_win32_tests
                 name: "Run Tests for Windows"
@@ -210,16 +210,15 @@ jobs:
         environment:
             PYTHON_NAME: pythonx86
             PYTHON_VERSION: 3.7.5
-            ARCH: x86
         steps:
             - checkout
             - run: *install_win32_python
             - restore_cache:
                 keys:
-                - cget-v2-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+                - cget-v3-x86-{{ arch }}-{{ checksum "requirements.txt" }}
             - run: *install_win32_native_libs
             - save_cache:
-                    key: cget-v2-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+                    key: cget-v3-x86-{{ arch }}-{{ checksum "requirements.txt" }}
                     paths: ["cget"]
             - run: *run_win32_tests
 
@@ -228,14 +227,12 @@ jobs:
         environment:
             PYTHON_NAME: pythonx86
             PYTHON_VERSION: 3.6.8
-            ARCH: x86
 
     test-win32-py35-x86:
         <<: *test-win32-x86
         environment:
             PYTHON_NAME: pythonx86
             PYTHON_VERSION: 3.5.4
-            ARCH: x86
 
 workflows:
     version: 2
