@@ -322,54 +322,54 @@ workflows:
             - dist-linux:
                 filters:
                   tags:
-                    only: /[0-9][.][0-9][.][0-9]/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-mac-py27:
                 filters:
                   tags:
-                    only: /[0-9][.][0-9][.][0-9]/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-mac-py37:
                 filters:
                   tags:
-                    only: /^[0-9][.][0-9][.][0-9]$/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-win32-py37-x64:
                 filters:
                   tags:
-                    only: /^[0-9][.][0-9][.][0-9]$/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-win32-py36-x64:
                 filters:
                   tags:
-                    only: /^[0-9][.][0-9][.][0-9]$/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-win32-py35-x64:
                 filters:
                   tags:
-                    only: /^[0-9][.][0-9][.][0-9]$/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-win32-py37-x86:
                 filters:
                   tags:
-                    only: /^[0-9][.][0-9][.][0-9]$/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-win32-py36-x86:
                 filters:
                   tags:
-                    only: /^[0-9][.][0-9][.][0-9]$/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
             - dist-win32-py35-x86:
                 filters:
                   tags:
-                    only: /^[0-9][.][0-9][.][0-9]$/
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
