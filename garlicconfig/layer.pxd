@@ -18,6 +18,7 @@ cdef extern from "GarlicConfig/garlicconfig.h" namespace "garlic":
         cbool is_double()
         cbool is_array()
         cbool is_object()
+        cbool is_null()
 
         const string& get_string()
         const int& get_int()
@@ -58,6 +59,9 @@ cdef extern from "GarlicConfig/garlicconfig.h" namespace "garlic":
 
     cdef cppclass ListValue(LayerValue):
         ListValue() except +
+
+    cdef cppclass NullValue(LayerValue):
+        NullValue() except +
 
     cdef shared_ptr[LayerValue] NotFoundPtr
 
