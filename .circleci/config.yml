@@ -178,12 +178,12 @@ jobs:
                 command: .circleci\install_python.ps1
             - restore_cache:
                 keys:
-                - cget-v3-x64-{{ arch }}-{{ checksum "requirements.txt" }}
+                - cget-v3-x64-{{ arch }}-{{ checksum "native_requirements.txt" }}
             - run: &install_win32_native_libs
                 name: "Resolve Native Dependencies"
                 command: .circleci\install_libs.ps1
             - save_cache:
-                    key: cget-v3-x64-{{ arch }}-{{ checksum "requirements.txt" }}
+                    key: cget-v3-x64-{{ arch }}-{{ checksum "native_requirements.txt" }}
                     paths: ["cget"]
             - run: &run_win32_tests
                 name: "Run Tests for Windows"
@@ -217,10 +217,10 @@ jobs:
             - run: *install_win32_python
             - restore_cache:
                 keys:
-                - cget-v3-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+                - cget-v3-x86-{{ arch }}-{{ checksum "native_requirements.txt" }}
             - run: *install_win32_native_libs
             - save_cache:
-                    key: cget-v3-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+                    key: cget-v3-x86-{{ arch }}-{{ checksum "native_requirements.txt" }}
                     paths: ["cget"]
             - run: *run_win32_tests
 
@@ -243,10 +243,10 @@ jobs:
             - run: *install_win32_python
             - restore_cache:
                 keys:
-                - cget-v3-x64-{{ arch }}-{{ checksum "requirements.txt" }}
+                - cget-v3-x64-{{ arch }}-{{ checksum "native_requirements.txt" }}
             - run: *install_win32_native_libs
             - save_cache:
-                    key: cget-v3-x64-{{ arch }}-{{ checksum "requirements.txt" }}
+                    key: cget-v3-x64-{{ arch }}-{{ checksum "native_requirements.txt" }}
                     paths: ["cget"]
             - run: &publish_win32
                 name: "Build Package And Submit"
@@ -277,10 +277,10 @@ jobs:
             - run: *install_win32_python
             - restore_cache:
                 keys:
-                - cget-v3-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+                - cget-v3-x86-{{ arch }}-{{ checksum "native_requirements.txt" }}
             - run: *install_win32_native_libs
             - save_cache:
-                    key: cget-v3-x86-{{ arch }}-{{ checksum "requirements.txt" }}
+                    key: cget-v3-x86-{{ arch }}-{{ checksum "native_requirements.txt" }}
                     paths: ["cget"]
             - run: &publish_win32
                 name: "Build Package And Submit"
