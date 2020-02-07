@@ -142,6 +142,7 @@ jobs:
             xcode: "10.0.0"
         environment:
             PYTHON_BIN: python
+            MACOSX_DEPLOYMENT_TARGET: 10.9
         steps:
             - checkout
             - run: *mac-create-virtualenv
@@ -162,6 +163,7 @@ jobs:
         <<: *dist-mac-template
         environment:
             PYTHON_BIN: python3
+            MACOSX_DEPLOYMENT_TARGET: 10.9
 
     test-win32-py37-x64: &test-win32-x64
         executor: win/default
