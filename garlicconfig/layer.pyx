@@ -45,6 +45,8 @@ cdef class GarlicValue(object):
             for item in value:
                 deref(list_value).add(GarlicValue.init_layer_value(item))
             return shared_ptr[LayerValue](list_value)
+        elif value is None:
+            return shared_ptr[LayerValue](new NullValue())
         else:
             raise TypeError('Unsupported Type: {invalid_type}'.format(invalid_type=type(value).__name__))
 
@@ -82,6 +84,8 @@ cdef class GarlicValue(object):
             return GarlicValue.map_object(value)
         elif deref(value).is_array():
             return GarlicValue.map_list(value)
+        elif deref(value).is_null():
+            return None
 
     def py_value(self):
         return GarlicValue.map_value(self.native_value)
