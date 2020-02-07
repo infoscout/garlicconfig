@@ -51,9 +51,9 @@ cdef class ConfigField(object):
         Low level method for validation. Do not use this method outside of this package, it's prone to change without
         further notice.
         """
-        if (value is None or value.is_null()) and null_check and not self.nullable:
+        if value is None and null_check and not self.nullable:
             raise ValidationError("Value for '{key}' is not allowed to be null.".format(key=self.name))
-        elif value is not None and not value.is_null():
+        elif value is not None:
             self.validate(value)
 
     def validate(self, value):
