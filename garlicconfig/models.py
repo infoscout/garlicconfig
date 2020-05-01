@@ -37,6 +37,8 @@ class ModelMetaClass(type):
 @six.add_metaclass(ModelMetaClass)
 class ConfigModel(object):
 
+    field_order = None  # Optional: how fields should be ordered when displayed
+
     def __init__(self):
         for field_name in self.__meta__.fields:
             value = getattr(self, field_name)
@@ -146,9 +148,13 @@ class ModelField(ConfigField):
         return self.model_class.from_dict(value)
 
     def __extra_desc__(self):
+        name = self.model_class.__name__
+        fields = self.model_class.get_model_desc_dict()
+        field_order = self.model_class.field_order or list(fields)
         return {
             'model_info': {
-                'name': self.model_class.__name__,
-                'fields': self.model_class.get_model_desc_dict(),
+                'name': name,
+                'fields': fields,
+                'field_order': field_order,
             }
         }
