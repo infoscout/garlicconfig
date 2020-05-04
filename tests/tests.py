@@ -259,9 +259,10 @@ class TestConfigModel(unittest.TestCase):
         with self.assertRaises(ValidationError):
             loaded_config.validate()
 
-    def test_model_desc(self):
+    def test_model_desc_wo_field_order(self):
         class KidConfig(ConfigModel):
             name = StringField(name='First Name', nullable=False, default='Sam')
+            age = IntegerField(domain=(0, 20))
 
         class ParentConfig(ConfigModel):
             name = StringField(name='First Name', desc='Enter your first name', nullable=False, default='Peter')
@@ -345,8 +346,245 @@ class TestConfigModel(unittest.TestCase):
                                             'nullable': False,
                                             'default': 'Sam'
                                         }
+                                    },
+                                    'age': {
+                                        'type': 'IntegerField',
+                                        'name': 'age',
+                                        'desc': None,
+                                        'extra': {
+                                            'nullable': True,
+                                            'default': None,
+                                            'domain': (0, 20)
+                                        }
                                     }
-                                }
+                                },
+                                'field_order': list(KidConfig.__meta__.fields)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        expected_end_result_json = json.dumps(expected_end_result, sort_keys=True)
+        actual_result_json = json.dumps(ParentConfig.get_model_desc_dict(), sort_keys=True)
+        self.assertEqual(actual_result_json, expected_end_result_json)
+
+    def test_model_desc_w_field_order_1(self):
+        class KidConfig(ConfigModel):
+            field_order = ['name', 'age']
+
+            name = StringField(name='First Name', nullable=False, default='Sam')
+            age = IntegerField(domain=(0, 20))
+
+        class ParentConfig(ConfigModel):
+            name = StringField(name='First Name', desc='Enter your first name', nullable=False, default='Peter')
+            status = StringField(desc='Whats your status?', choices=('Good', 'Bad', 'Indifferent'))
+            age = IntegerField(domain=(21, 150))
+            nick_names = ArrayField(StringField(), name='Nick Names', nullable=False, default=['No Nick Name'])
+            kids = ArrayField(ModelField(KidConfig))
+
+        expected_end_result = {
+            'name': {
+                'type': 'StringField',
+                'name': 'First Name',
+                'desc': 'Enter your first name',
+                'extra': {
+                    'nullable': False,
+                    'default': 'Peter',
+                }
+            },
+            'status': {
+                'type': 'StringField',
+                'name': 'status',
+                'desc': 'Whats your status?',
+                'extra': {
+                    'choices': ('Good', 'Bad', 'Indifferent',),
+                    'nullable': True,
+                    'default': None,
+                }
+            },
+            'age': {
+                'type': 'IntegerField',
+                'name': 'age',
+                'desc': None,
+                'extra': {
+                    'nullable': True,
+                    'default': None,
+                    'domain': (21, 150)
+                }
+            },
+            'nick_names': {
+                'type': 'ArrayField',
+                'name': 'Nick Names',
+                'desc': None,
+                'extra': {
+                    'nullable': False,
+                    'default': ['No Nick Name'],
+                    'element_info': {
+                        'type': 'StringField',
+                        'name': 'StringField',
+                        'desc': None,
+                        'extra': {
+                            'nullable': True,
+                            'default': None,
+                        }
+                    }
+                }
+            },
+            'kids': {
+                'type': 'ArrayField',
+                'name': 'kids',
+                'desc': None,
+                'extra': {
+                    'nullable': True,
+                    'default': None,
+                    'element_info': {
+                        'type': 'ModelField',
+                        'name': 'ModelField',
+                        'desc': None,
+                        'extra': {
+                            'nullable': True,
+                            'default': {
+                                'name': 'Sam'
+                            },
+                            'model_info': {
+                                'name': 'KidConfig',
+                                'fields': {
+                                    'name': {
+                                        'type': 'StringField',
+                                        'name': 'First Name',
+                                        'desc': None,
+                                        'extra': {
+                                            'nullable': False,
+                                            'default': 'Sam'
+                                        }
+                                    },
+                                    'age': {
+                                        'type': 'IntegerField',
+                                        'name': 'age',
+                                        'desc': None,
+                                        'extra': {
+                                            'nullable': True,
+                                            'default': None,
+                                            'domain': (0, 20)
+                                        }
+                                    }
+                                },
+                                'field_order': ['name', 'age']
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        expected_end_result_json = json.dumps(expected_end_result, sort_keys=True)
+        actual_result_json = json.dumps(ParentConfig.get_model_desc_dict(), sort_keys=True)
+        self.assertEqual(actual_result_json, expected_end_result_json)
+
+    def test_model_desc_w_field_order_2(self):
+        class KidConfig(ConfigModel):
+            field_order = ['age', 'name']
+
+            name = StringField(name='First Name', nullable=False, default='Sam')
+            age = IntegerField(domain=(0, 20))
+
+        class ParentConfig(ConfigModel):
+            name = StringField(name='First Name', desc='Enter your first name', nullable=False, default='Peter')
+            status = StringField(desc='Whats your status?', choices=('Good', 'Bad', 'Indifferent'))
+            age = IntegerField(domain=(21, 150))
+            nick_names = ArrayField(StringField(), name='Nick Names', nullable=False, default=['No Nick Name'])
+            kids = ArrayField(ModelField(KidConfig))
+
+        expected_end_result = {
+            'name': {
+                'type': 'StringField',
+                'name': 'First Name',
+                'desc': 'Enter your first name',
+                'extra': {
+                    'nullable': False,
+                    'default': 'Peter',
+                }
+            },
+            'status': {
+                'type': 'StringField',
+                'name': 'status',
+                'desc': 'Whats your status?',
+                'extra': {
+                    'choices': ('Good', 'Bad', 'Indifferent',),
+                    'nullable': True,
+                    'default': None,
+                }
+            },
+            'age': {
+                'type': 'IntegerField',
+                'name': 'age',
+                'desc': None,
+                'extra': {
+                    'nullable': True,
+                    'default': None,
+                    'domain': (21, 150)
+                }
+            },
+            'nick_names': {
+                'type': 'ArrayField',
+                'name': 'Nick Names',
+                'desc': None,
+                'extra': {
+                    'nullable': False,
+                    'default': ['No Nick Name'],
+                    'element_info': {
+                        'type': 'StringField',
+                        'name': 'StringField',
+                        'desc': None,
+                        'extra': {
+                            'nullable': True,
+                            'default': None,
+                        }
+                    }
+                }
+            },
+            'kids': {
+                'type': 'ArrayField',
+                'name': 'kids',
+                'desc': None,
+                'extra': {
+                    'nullable': True,
+                    'default': None,
+                    'element_info': {
+                        'type': 'ModelField',
+                        'name': 'ModelField',
+                        'desc': None,
+                        'extra': {
+                            'nullable': True,
+                            'default': {
+                                'name': 'Sam'
+                            },
+                            'model_info': {
+                                'name': 'KidConfig',
+                                'fields': {
+                                    'name': {
+                                        'type': 'StringField',
+                                        'name': 'First Name',
+                                        'desc': None,
+                                        'extra': {
+                                            'nullable': False,
+                                            'default': 'Sam'
+                                        }
+                                    },
+                                    'age': {
+                                        'type': 'IntegerField',
+                                        'name': 'age',
+                                        'desc': None,
+                                        'extra': {
+                                            'nullable': True,
+                                            'default': None,
+                                            'domain': (0, 20)
+                                        }
+                                    }
+                                },
+                                'field_order': ['age', 'name']
                             }
                         }
                     }
