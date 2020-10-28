@@ -79,11 +79,6 @@ jobs:
             PYTHON_PATH: /opt/python/cp27-cp27mu/bin
         <<: *test-suite-linux-template
 
-    test-linux-py34m:
-        environment:
-            PYTHON_PATH: /opt/python/cp34-cp34m/bin
-        <<: *test-suite-linux-template
-
     test-linux-py35m:
         environment:
             PYTHON_PATH: /opt/python/cp35-cp35m/bin
@@ -97,6 +92,11 @@ jobs:
     test-linux-py37m:
         environment:
             PYTHON_PATH: /opt/python/cp37-cp37m/bin
+        <<: *test-suite-linux-template
+
+    test-linux-py38:
+        environment:
+            PYTHON_PATH: /opt/python/cp38-cp38/bin
         <<: *test-suite-linux-template
 
     dist-linux:
@@ -313,10 +313,10 @@ workflows:
             - lint-checks
             - test-linux-py27m
             - test-linux-py27mu
-            - test-linux-py34m
             - test-linux-py35m
             - test-linux-py36m
             - test-linux-py37m
+            - test-linux-py38
             - test-mac-py27
             - test-mac-py37
             - dist-linux:
