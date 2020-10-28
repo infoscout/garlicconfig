@@ -79,11 +79,6 @@ jobs:
             PYTHON_PATH: /opt/python/cp27-cp27mu/bin
         <<: *test-suite-linux-template
 
-    test-linux-py34m:
-        environment:
-            PYTHON_PATH: /opt/python/cp34-cp34m/bin
-        <<: *test-suite-linux-template
-
     test-linux-py35m:
         environment:
             PYTHON_PATH: /opt/python/cp35-cp35m/bin
@@ -99,7 +94,7 @@ jobs:
             PYTHON_PATH: /opt/python/cp37-cp37m/bin
         <<: *test-suite-linux-template
 
-    test-linux-py38m:
+    test-linux-py38:
         environment:
             PYTHON_PATH: /opt/python/cp38-cp38/bin
         <<: *test-suite-linux-template
@@ -196,13 +191,6 @@ jobs:
                     cd tests
                     python tests.py
 
-    test-win32-py38-x64:
-        <<: *test-win32-x64
-        environment:
-            PYTHON_NAME: python
-            PYTHON_VERSION: 3.8.5
-            ARCH: x64
-
     test-win32-py36-x64:
         <<: *test-win32-x64
         environment:
@@ -233,12 +221,6 @@ jobs:
                     key: cget-v3-x86-{{ arch }}-{{ checksum "native_requirements.txt" }}
                     paths: ["cget"]
             - run: *run_win32_tests
-
-    test-win32-py38-x86:
-        <<: *test-win32-x86
-        environment:
-            PYTHON_NAME: pythonx86
-            PYTHON_VERSION: 3.8.5
 
     test-win32-py36-x86:
         <<: *test-win32-x86
@@ -279,13 +261,6 @@ jobs:
             PYTHON_VERSION: 3.6.8
             ARCH: x64
 
-    dist-win32-py38-x64:
-        <<: *dist-win32-x64
-        environment:
-            PYTHON_NAME: python
-            PYTHON_VERSION: 3.8.5
-            ARCH: x64
-
     dist-win32-py35-x64:
         <<: *dist-win32-x64
         environment:
@@ -313,12 +288,6 @@ jobs:
                     pip install twine
                     twine upload dist/*
 
-    dist-win32-py38-x86:
-        <<: *dist-win32-x86
-        environment:
-            PYTHON_NAME: pythonx86
-            PYTHON_VERSION: 3.8.5
-
     dist-win32-py36-x86:
         <<: *dist-win32-x86
         environment:
@@ -338,19 +307,16 @@ workflows:
             - test-win32-py35-x86
             - test-win32-py36-x86
             - test-win32-py37-x86
-            - test-win32-py38-x86
             - test-win32-py35-x64
             - test-win32-py36-x64
             - test-win32-py37-x64
-            - test-win32-py38-x64
             - lint-checks
             - test-linux-py27m
             - test-linux-py27mu
-            - test-linux-py34m
             - test-linux-py35m
             - test-linux-py36m
             - test-linux-py37m
-            - test-linux-py38m
+            - test-linux-py38
             - test-mac-py27
             - test-mac-py37
             - dist-linux:
