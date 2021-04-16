@@ -1,0 +1,57 @@
+version: "3.0"
+
+services:
+  py27:
+      build:
+          dockerfile: docker/Dockerfile
+          context: .
+      environment:
+          PYTHON_VERSION: cp27-cp27mu
+      volumes:
+          - ./:/project
+          - /project/build
+          - /project/dist
+
+  py36:
+      build:
+          dockerfile: docker/Dockerfile
+          context: .
+      environment:
+          PYTHON_VERSION: cp36-cp36m
+      volumes:
+          - ./:/project
+          - /project/build
+          - /project/dist
+
+  py37:
+      build:
+          dockerfile: docker/Dockerfile
+          context: .
+      environment:
+          PYTHON_VERSION: cp37-cp37m
+      volumes:
+          - ./:/project
+          - /project/build
+          - /project/dist
+
+  py38:
+      build:
+          dockerfile: docker/Dockerfile
+          context: .
+      environment:
+          PYTHON_VERSION: cp38-cp38
+      volumes:
+          - ./:/project
+          - /project/build
+          - /project/dist
+
+  py39:
+      build:
+          dockerfile: docker/Dockerfile
+          context: .
+      environment:
+          PYTHON_VERSION: cp39-cp39
+      volumes:
+          - ./:/project
+          - /project/build
+          - /project/dist

@@ -1,12 +1,14 @@
+import os
 from setuptools import find_packages, setup
 from setuptools.extension import Extension
 from Cython.Build import cythonize
 
+CGET_PATH = os.environ.get('CGET_PATH', 'cget')
 
 common_params = dict(
     language='c++',
-    include_dirs=['cget/include'],
-    library_dirs=['cget/lib', 'cget/lib64'],
+    include_dirs=[os.path.join(CGET_PATH, 'include')],
+    library_dirs=[os.path.join(CGET_PATH, 'lib'), os.path.join(CGET_PATH, 'lib64')],
     libraries=['GarlicConfig'],
     extra_compile_args=['-std=c++11']
 )
