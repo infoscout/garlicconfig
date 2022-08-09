@@ -110,7 +110,7 @@ jobs:
 
     test-mac-py36: &test-mac-template
         macos:
-            xcode: "10.0.0"
+            xcode: "13.4.1"
         environment:
             PYTHON_BIN: python
         steps:
@@ -129,7 +129,7 @@ jobs:
 
     dist-mac-py36: &dist-mac-template
         macos:
-            xcode: "10.0.0"
+            xcode: "13.4.1"
         environment:
             PYTHON_BIN: python
         steps:
