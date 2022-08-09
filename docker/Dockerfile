@@ -8,6 +8,7 @@ WORKDIR /project
 
 RUN /root/setup.sh  # install cython on all pythons.
 
+
 ENV PATH=/opt/python/cp27-cp27mu/bin:${PATH}
 
 RUN pip install cget cmake
