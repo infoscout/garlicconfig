@@ -69,16 +69,6 @@ jobs:
                     source venv/bin/activate
                     flake8 garlicconfig
 
-    test-linux-py27m:
-        environment:
-            PYTHON_PATH: /opt/python/cp27-cp27m/bin
-        <<: *test-suite-linux-template
-
-    test-linux-py27mu:
-        environment:
-            PYTHON_PATH: /opt/python/cp27-cp27mu/bin
-        <<: *test-suite-linux-template
-
     test-linux-py35m:
         environment:
             PYTHON_PATH: /opt/python/cp35-cp35m/bin
@@ -118,45 +108,10 @@ jobs:
                     $PYTHON_PATH/pip install twine
                     $PYTHON_PATH/twine upload wheelhouse/*
 
-    test-mac-py27: &test-mac-template
-        macos:
-            xcode: "10.0.0"
-        environment:
-            PYTHON_BIN: python
-        steps:
-            - checkout
-            - run: *mac-create-virtualenv
-            - run: *mac-install-requirements
-            - restore_cache: *restore_cache
-            - run: *install_dependencies
-            - save_cache: *save_cache
-            - run: *run-test-with-coverage
-
     test-mac-py37:
         <<: *test-mac-template
         environment:
             PYTHON_BIN: python3
-
-    dist-mac-py27: &dist-mac-template
-        macos:
-            xcode: "10.0.0"
-        environment:
-            PYTHON_BIN: python
-        steps:
-            - checkout
-            - run: *mac-create-virtualenv
-            - run: *mac-install-requirements
-            - restore_cache: *restore_cache
-            - run: *install_dependencies
-            - save_cache: *save_cache
-            - run:
-                name: 'Build Wheel Package'
-                command: $PYTHON_PATH/python setup.py bdist_wheel
-            - run:
-                name: 'Twine :: Upload to PyPI'
-                command: |
-                    $PYTHON_PATH/pip install twine
-                    $PYTHON_PATH/twine upload dist/*
 
     dist-mac-py37:
         <<: *dist-mac-template
@@ -311,21 +266,12 @@ workflows:
             - test-win32-py36-x64
             - test-win32-py37-x64
             - lint-checks
-            - test-linux-py27m
-            - test-linux-py27mu
             - test-linux-py35m
             - test-linux-py36m
             - test-linux-py37m
             - test-linux-py38
-            - test-mac-py27
             - test-mac-py37
             - dist-linux:
-                filters:
-                  tags:
-                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
-                  branches:
-                    ignore: /.*/
-            - dist-mac-py27:
                 filters:
                   tags:
                     only: /^[0-9]*[.][0-9]*[.][0-9]*$/
