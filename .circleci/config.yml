@@ -127,6 +127,27 @@ jobs:
         environment:
             PYTHON_BIN: python3
 
+    dist-mac-py36: &dist-mac-template
+        macos:
+            xcode: "10.0.0"
+        environment:
+            PYTHON_BIN: python
+        steps:
+            - checkout
+            - run: *mac-create-virtualenv
+            - run: *mac-install-requirements
+            - restore_cache: *restore_cache
+            - run: *install_dependencies
+            - save_cache: *save_cache
+            - run:
+                name: 'Build Wheel Package'
+                command: $PYTHON_PATH/python setup.py bdist_wheel
+            - run:
+                name: 'Twine :: Upload to PyPI'
+                command: |
+                    $PYTHON_PATH/pip install twine
+                    $PYTHON_PATH/twine upload dist/*
+
     dist-mac-py37:
         <<: *dist-mac-template
         environment:
