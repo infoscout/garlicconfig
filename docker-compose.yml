@@ -1,17 +1,6 @@
 version: "3.0"
 
 services:
-  py27:
-      build:
-          dockerfile: docker/Dockerfile
-          context: .
-      environment:
-          PYTHON_VERSION: cp27-cp27mu
-      volumes:
-          - ./:/project
-          - /project/build
-          - /project/dist
-
   py36:
       build:
           dockerfile: docker/Dockerfile

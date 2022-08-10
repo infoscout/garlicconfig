@@ -69,16 +69,6 @@ jobs:
                     source venv/bin/activate
                     flake8 garlicconfig
 
-    test-linux-py27m:
-        environment:
-            PYTHON_PATH: /opt/python/cp27-cp27m/bin
-        <<: *test-suite-linux-template
-
-    test-linux-py27mu:
-        environment:
-            PYTHON_PATH: /opt/python/cp27-cp27mu/bin
-        <<: *test-suite-linux-template
-
     test-linux-py35m:
         environment:
             PYTHON_PATH: /opt/python/cp35-cp35m/bin
@@ -118,9 +108,9 @@ jobs:
                     $PYTHON_PATH/pip install twine
                     $PYTHON_PATH/twine upload wheelhouse/*
 
-    test-mac-py27: &test-mac-template
+    test-mac-py36: &test-mac-template
         macos:
-            xcode: "10.0.0"
+            xcode: "13.4.1"
         environment:
             PYTHON_BIN: python
         steps:
@@ -137,9 +127,9 @@ jobs:
         environment:
             PYTHON_BIN: python3
 
-    dist-mac-py27: &dist-mac-template
+    dist-mac-py36: &dist-mac-template
         macos:
-            xcode: "10.0.0"
+            xcode: "13.4.1"
         environment:
             PYTHON_BIN: python
         steps:
@@ -311,21 +301,13 @@ workflows:
             - test-win32-py36-x64
             - test-win32-py37-x64
             - lint-checks
-            - test-linux-py27m
-            - test-linux-py27mu
             - test-linux-py35m
             - test-linux-py36m
             - test-linux-py37m
             - test-linux-py38
-            - test-mac-py27
+            - test-mac-py36
             - test-mac-py37
             - dist-linux:
-                filters:
-                  tags:
-                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
-                  branches:
-                    ignore: /.*/
-            - dist-mac-py27:
                 filters:
                   tags:
                     only: /^[0-9]*[.][0-9]*[.][0-9]*$/
