@@ -101,8 +101,8 @@ jobs:
                 name: 'Build Wheel Packages'
                 command: ./.circleci/dist-linux.sh
             - run:
-                name: 'apt install libffi-dev'
-                command: apt install libffi-dev
+                name: 'yum makecache && yum -y install libffi-devel'
+                command: yum makecache && yum -y install libffi-devel
             - run:
                 name: 'Twine :: Upload to PyPI'
                 environment:
