@@ -106,11 +106,9 @@ jobs:
                 command: ./.circleci/dist-linux.sh
             - run:
                 name: 'Twine :: Upload to PyPI'
-                environment:
-                    PYTHON_PATH: /opt/python/cp37-cp37m/bin
                 command: |
-                    $PYTHON_PATH/pip install twine
-                    $PYTHON_PATH/twine upload wheelhouse/*
+                    pip install twine
+                    twine upload wheelhouse/*
 
     test-mac-py36: &test-mac-template
         macos:
