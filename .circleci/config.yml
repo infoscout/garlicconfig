@@ -96,7 +96,7 @@ jobs:
             - checkout
             - restore_cache: *restore_cache
             - run: 'install system packages'
-              command: apt install libffi-dev cget
+              command: 'apt install libffi-dev cget'
             - run: *install_dependencies
             - save_cache: *save_cache
             - run:
