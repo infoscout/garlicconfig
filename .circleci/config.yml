@@ -91,7 +91,7 @@ jobs:
 
     dist-linux:
         docker:
-            - image: peymanmo/many_x64
+          - image: circleci/python:3.9
         steps:
             - checkout
             - restore_cache: *restore_cache
@@ -101,8 +101,8 @@ jobs:
                 name: 'Build Wheel Packages'
                 command: ./.circleci/dist-linux.sh
             - run:
-                name: 'yum makecache && yum -y install libffi-devel'
-                command: yum makecache && yum -y install libffi-devel
+                name: 'apt install libffi-dev'
+                command: apt install libffi-dev
             - run:
                 name: 'Twine :: Upload to PyPI'
                 environment:
