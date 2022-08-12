@@ -91,7 +91,7 @@ jobs:
 
     dist-linux:
         docker:
-          - image: circleci/python:3.9
+          - image: python:3.9-slim-buster
         steps:
             - checkout
             - restore_cache: *restore_cache
