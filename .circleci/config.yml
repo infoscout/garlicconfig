@@ -97,7 +97,8 @@ jobs:
             - restore_cache: *restore_cache
             - run: 
                 name: 'install system packages'
-                command: 'apt update && apt install libffi-dev cget'
+                command: |
+                  pip install cget
             - run: *install_dependencies
             - save_cache: *save_cache
             - run:
