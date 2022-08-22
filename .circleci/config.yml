@@ -98,7 +98,7 @@ jobs:
             - run: 
                 name: 'install system packages'
                 command: |
-                  pip install cget
+                  pip install cget cython
             - run: *install_dependencies
             - save_cache: *save_cache
             - run:
