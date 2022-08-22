@@ -10,7 +10,7 @@ rm -fr dist
 repair_dist () {
     for i in $(ls dist);
     do
-        auditwheel repair dist/$i
+        auditwheel repair --plat manylinux_2_31_x86_64 dist/$i
     done;
     rm -fr build
     rm -fr dist
