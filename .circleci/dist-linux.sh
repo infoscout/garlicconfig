@@ -17,5 +17,6 @@ repair_dist () {
 }
 
 
+pip install auditwheel
 python setup.py bdist_wheel
 repair_dist
