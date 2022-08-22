@@ -100,8 +100,8 @@ jobs:
             - run: 
                 name: 'install system packages'
                 command: |
-                  apt update
-                  apt install build-essential
+                  apt-get update
+                  apt-get install build-essential
                   pip install cget cython
             - run: *install_dependencies
             - save_cache: *save_cache
