@@ -1,4 +1,4 @@
 scikit-build
-Cython==0.28.5
+Cython==0.29.32
 cget==0.1.6
 cmake==3.24.1
