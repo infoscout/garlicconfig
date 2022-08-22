@@ -1,4 +1,4 @@
+scikit-build
 Cython==0.28.5
 cget==0.1.6
 cmake==3.12.0
-scikit-build
