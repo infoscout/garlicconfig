@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# CURRENT_DIR=$(pwd)
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_DIR/cget/lib:$CURRENT_DIR/cget/lib64
+CURRENT_DIR=$(pwd)
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_DIR/cget/lib:$CURRENT_DIR/cget/lib64
 
 rm -fr build
 rm -fr dist
