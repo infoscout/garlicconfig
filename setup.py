@@ -53,6 +53,6 @@ setup(
     version=version,
     install_requires=['six'],
     keywords=['configs', 'settings'],
-    ext_modules=cythonize(ext_modules, language_level="3"),
+    ext_modules=cythonize(ext_modules),
     zip_safe=False
 )
