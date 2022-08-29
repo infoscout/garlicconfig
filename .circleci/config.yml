@@ -110,8 +110,8 @@ jobs:
                 name: 'install system packages'
                 command: |
                   sudo apt-get update
-                  sudo apt-get -y install build-essential patchelf
-                  sudo pip install cget cython
+                  sudo apt-get -y install build-essential patchelf pip
+                  pip install cget cython
             - run: *install_dependencies
             - save_cache: *save_cache
             - run:
