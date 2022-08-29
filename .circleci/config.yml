@@ -20,20 +20,24 @@ aliases:
         command: |
             rm -fr build
             rm -fr dist
-            $PYTHON_PATH/python setup.py install
-            $PYTHON_PATH/pip install coverage
+            python setup.py install
+            pip install coverage
             cd tests
-            $PYTHON_PATH/coverage run tests.py
+            coverage run tests.py
             bash <(curl -s https://codecov.io/bash) -t 2a289a72-91f5-4a4c-b011-fc9288666a49
     - &update_ld_library_path
         name: "Update Library Search Path"
         command: echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64' >> $BASH_ENV
     - &test-suite-linux-template
-        docker:
-            - image: peymanmo/many_x64
         steps:
             - checkout
-            - restore_cache: *restore_cache
+              #- restore_cache: *restore_cache
+            - run: 
+                name: 'install system packages'
+                command: |
+                  sudo apt-get update
+                  sudo apt-get -y install build-essential patchelf pip
+                  pip install cget cython cmake
             - run: *install_dependencies
             - save_cache: *save_cache
             - run: *update_ld_library_path
@@ -46,12 +50,14 @@ aliases:
             echo 'export PYTHON_PATH=$(pwd)/venv/bin' >> $BASH_ENV
     - &mac-install-requirements
         name: "Install Development Tools"
-        command: pip install -r requirements.txt
+        command: |
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
 
 jobs:
     lint-checks:
         docker:
-            - image: circleci/python:2.7.13
+            - image: cimg/python:3.9
         steps:
             - checkout
             - run:
@@ -70,31 +76,42 @@ jobs:
                     flake8 garlicconfig
 
     test-linux-py35m:
-        environment:
-            PYTHON_PATH: /opt/python/cp35-cp35m/bin
+        docker:
+            - image: cimg/python:3.5
         <<: *test-suite-linux-template
 
     test-linux-py36m:
-        environment:
-            PYTHON_PATH: /opt/python/cp36-cp36m/bin
+        docker:
+            - image: cimg/python:3.6
         <<: *test-suite-linux-template
 
     test-linux-py37m:
-        environment:
-            PYTHON_PATH: /opt/python/cp37-cp37m/bin
+        docker:
+            - image: cimg/python:3.7
         <<: *test-suite-linux-template
 
     test-linux-py38:
-        environment:
-            PYTHON_PATH: /opt/python/cp38-cp38/bin
+        docker:
+            - image: cimg/python:3.8
+        <<: *test-suite-linux-template
+
+    test-linux-py39:
+        docker:
+            - image: cimg/python:3.9
         <<: *test-suite-linux-template
 
     dist-linux:
         docker:
-            - image: peymanmo/many_x64
+          - image: quay.io/pypa/manylinux2014_x86_64
         steps:
             - checkout
             - restore_cache: *restore_cache
+            - run: 
+                name: 'install system packages'
+                command: |
+                  yum -y install gcc patchelf python3 python3-pip python3-devel
+                  pip3 install --upgrade pip
+                  pip3 install wheel auditwheel cget cython twine
             - run: *install_dependencies
             - save_cache: *save_cache
             - run:
@@ -102,11 +119,8 @@ jobs:
                 command: ./.circleci/dist-linux.sh
             - run:
                 name: 'Twine :: Upload to PyPI'
-                environment:
-                    PYTHON_PATH: /opt/python/cp37-cp37m/bin
                 command: |
-                    $PYTHON_PATH/pip install twine
-                    $PYTHON_PATH/twine upload wheelhouse/*
+                    twine upload wheelhouse/*
 
     test-mac-py36: &test-mac-template
         macos:
@@ -218,12 +232,6 @@ jobs:
             PYTHON_NAME: pythonx86
             PYTHON_VERSION: 3.6.8
 
-    test-win32-py35-x86:
-        <<: *test-win32-x86
-        environment:
-            PYTHON_NAME: pythonx86
-            PYTHON_VERSION: 3.5.4
-
     dist-win32-py37-x64: &dist-win32-x64
         <<: *test-win32-x64
         steps:
@@ -249,13 +257,6 @@ jobs:
         environment:
             PYTHON_NAME: python
             PYTHON_VERSION: 3.6.8
-            ARCH: x64
-
-    dist-win32-py35-x64:
-        <<: *dist-win32-x64
-        environment:
-            PYTHON_NAME: python
-            PYTHON_VERSION: 3.5.4
             ARCH: x64
 
     dist-win32-py37-x86: &dist-win32-x86
@@ -294,10 +295,8 @@ workflows:
     version: 2
     pr-checks:
         jobs:
-            - test-win32-py35-x86
             - test-win32-py36-x86
             - test-win32-py37-x86
-            - test-win32-py35-x64
             - test-win32-py36-x64
             - test-win32-py37-x64
             - lint-checks
@@ -305,6 +304,7 @@ workflows:
             - test-linux-py36m
             - test-linux-py37m
             - test-linux-py38
+            - test-linux-py39
             - test-mac-py36
             - test-mac-py37
             - dist-linux:
@@ -331,12 +331,6 @@ workflows:
                     only: /^[0-9]*[.][0-9]*[.][0-9]*$/
                   branches:
                     ignore: /.*/
-            - dist-win32-py35-x64:
-                filters:
-                  tags:
-                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
-                  branches:
-                    ignore: /.*/
             - dist-win32-py37-x86:
                 filters:
                   tags:
@@ -344,12 +338,6 @@ workflows:
                   branches:
                     ignore: /.*/
             - dist-win32-py36-x86:
-                filters:
-                  tags:
-                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
-                  branches:
-                    ignore: /.*/
-            - dist-win32-py35-x86:
                 filters:
                   tags:
                     only: /^[0-9]*[.][0-9]*[.][0-9]*$/

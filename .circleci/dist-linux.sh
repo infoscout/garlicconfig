@@ -10,15 +10,12 @@ rm -fr dist
 repair_dist () {
     for i in $(ls dist);
     do
-        auditwheel repair dist/$i
+        auditwheel repair --plat manylinux_2_24_x86_64 dist/$i
     done;
     rm -fr build
     rm -fr dist
 }
 
 
-for i in $(ls /opt/python);
-do
-    /opt/python/$i/bin/python setup.py bdist_wheel
-    repair_dist
-done
+python3 setup.py bdist_wheel
+repair_dist
