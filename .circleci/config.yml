@@ -120,7 +120,7 @@ jobs:
             - run:
                 name: 'Twine :: Upload to PyPI'
                 command: |
-                    pip install twine
+                    pip3 install twine
                     twine upload wheelhouse/*
 
     test-mac-py36: &test-mac-template
