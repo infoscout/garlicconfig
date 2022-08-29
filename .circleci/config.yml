@@ -36,7 +36,7 @@ aliases:
                 name: 'install system packages'
                 command: |
                   sudo apt-get update
-                  sudo apt-get -y install build-essential patchelf
+                  sudo apt-get -y install build-essential patchelf pip
                   sudo pip install cget cython cmake
             - run: *install_dependencies
             - save_cache: *save_cache
