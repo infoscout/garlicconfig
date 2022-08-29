@@ -57,7 +57,7 @@ aliases:
 jobs:
     lint-checks:
         docker:
-            - image: circleci/python:3.9
+            - image: cimg/python:3.9
         steps:
             - checkout
             - run:
@@ -77,42 +77,42 @@ jobs:
 
     test-linux-py35m:
         environment:
-            PYTHON_PATH: /usr/local/bin/python
+            PYTHON_PATH: /usr/local/bin/
         docker:
-            - image: circleci/python:3.5
+            - image: cimg/python:3.5
         <<: *test-suite-linux-template
 
     test-linux-py36m:
         environment:
-            PYTHON_PATH: /usr/local/bin/python
+            PYTHON_PATH: /usr/local/bin/
         docker:
-            - image: circleci/python:3.6
+            - image: cimg/python:3.6
         <<: *test-suite-linux-template
 
     test-linux-py37m:
         environment:
-            PYTHON_PATH: /usr/local/bin/python
+            PYTHON_PATH: /usr/local/bin/
         docker:
-            - image: circleci/python:3.7
+            - image: cimg/python:3.7
         <<: *test-suite-linux-template
 
     test-linux-py38:
         environment:
-            PYTHON_PATH: /usr/local/bin/python
+            PYTHON_PATH: /usr/local/bin/
         docker:
-            - image: circleci/python:3.8
+            - image: cimg/python:3.8
         <<: *test-suite-linux-template
 
     test-linux-py39:
         environment:
-            PYTHON_PATH: /opt/python/cp38-cp38/bin
+            PYTHON_PATH: /usr/local/bin/
         docker:
-            - image: circleci/python:3.9
+            - image: cimg/python:3.9
         <<: *test-suite-linux-template
 
     dist-linux:
         docker:
-          - image: circleci/python:3.9
+          - image: cimg/python:3.9
         steps:
             - checkout
             - restore_cache: *restore_cache
