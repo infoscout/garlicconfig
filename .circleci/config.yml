@@ -110,6 +110,7 @@ jobs:
                 name: 'install system packages'
                 command: |
                   yum -y install gcc patchelf rh-python38 rh-python38-python-pip
+                  scl enable rh-python38 bash
                   pip3 install wheel auditwheel
                   pip3 install cget cython
             - run: *install_dependencies
