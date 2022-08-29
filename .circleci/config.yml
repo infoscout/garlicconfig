@@ -29,8 +29,6 @@ aliases:
         name: "Update Library Search Path"
         command: echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/cget/lib:$(pwd)/cget/lib64' >> $BASH_ENV
     - &test-suite-linux-template
-        docker:
-            - image: circleci/python:3.9
         steps:
             - checkout
               #- restore_cache: *restore_cache
@@ -79,22 +77,37 @@ jobs:
 
     test-linux-py35m:
         environment:
-            PYTHON_PATH: /opt/python/cp35-cp35m/bin
+            PYTHON_PATH: /usr/local/bin/python
+        docker:
+            - image: circleci/python:3.5
         <<: *test-suite-linux-template
 
     test-linux-py36m:
         environment:
-            PYTHON_PATH: /opt/python/cp36-cp36m/bin
+            PYTHON_PATH: /usr/local/bin/python
+        docker:
+            - image: circleci/python:3.6
         <<: *test-suite-linux-template
 
     test-linux-py37m:
         environment:
-            PYTHON_PATH: /opt/python/cp37-cp37m/bin
+            PYTHON_PATH: /usr/local/bin/python
+        docker:
+            - image: circleci/python:3.7
         <<: *test-suite-linux-template
 
     test-linux-py38:
         environment:
+            PYTHON_PATH: /usr/local/bin/python
+        docker:
+            - image: circleci/python:3.8
+        <<: *test-suite-linux-template
+
+    test-linux-py39:
+        environment:
             PYTHON_PATH: /opt/python/cp38-cp38/bin
+        docker:
+            - image: circleci/python:3.9
         <<: *test-suite-linux-template
 
     dist-linux:
@@ -302,6 +315,7 @@ workflows:
             - test-linux-py36m
             - test-linux-py37m
             - test-linux-py38
+            - test-linux-py39
             - test-mac-py36
             - test-mac-py37
             - dist-linux:
