@@ -102,16 +102,16 @@ jobs:
 
     dist-linux:
         docker:
-          - image: cimg/python:3.9
+          - image: quay.io/pypa/manylinux2014_x86_64
         steps:
             - checkout
             - restore_cache: *restore_cache
             - run: 
                 name: 'install system packages'
                 command: |
-                  sudo apt-get update
-                  sudo apt-get -y install build-essential patchelf pip
-                  pip install cget cython
+                  yum -y install gcc patchelf rh-python38 rh-python38-python-pip
+                  pip3 install wheel auditwheel
+                  pip3 install cget cython
             - run: *install_dependencies
             - save_cache: *save_cache
             - run:
