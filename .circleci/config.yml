@@ -39,7 +39,7 @@ aliases:
                 command: |
                   sudo apt-get update
                   sudo apt-get -y install build-essential patchelf
-                  sudo pip install cget cython
+                  sudo pip install cget cython cmake
             - run: *install_dependencies
             - save_cache: *save_cache
             - run: *update_ld_library_path
