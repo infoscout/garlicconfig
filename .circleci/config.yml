@@ -76,36 +76,26 @@ jobs:
                     flake8 garlicconfig
 
     test-linux-py35m:
-        environment:
-            PYTHON_PATH: /usr/local/bin
         docker:
             - image: cimg/python:3.5
         <<: *test-suite-linux-template
 
     test-linux-py36m:
-        environment:
-            PYTHON_PATH: /usr/local/bin
         docker:
             - image: cimg/python:3.6
         <<: *test-suite-linux-template
 
     test-linux-py37m:
-        environment:
-            PYTHON_PATH: /usr/local/bin
         docker:
             - image: cimg/python:3.7
         <<: *test-suite-linux-template
 
     test-linux-py38:
-        environment:
-            PYTHON_PATH: /usr/local/bin
         docker:
             - image: cimg/python:3.8
         <<: *test-suite-linux-template
 
     test-linux-py39:
-        environment:
-            PYTHON_PATH: /usr/local/bin
         docker:
             - image: cimg/python:3.9
         <<: *test-suite-linux-template
