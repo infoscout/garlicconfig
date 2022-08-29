@@ -100,9 +100,9 @@ jobs:
             - run: 
                 name: 'install system packages'
                 command: |
-                  apt-get update
-                  apt-get -y install build-essential patchelf
-                  pip install cget cython
+                  sudo apt-get update
+                  sudo apt-get -y install build-essential patchelf
+                  sudo pip install cget cython
             - run: *install_dependencies
             - save_cache: *save_cache
             - run:
