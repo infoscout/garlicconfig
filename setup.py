@@ -40,8 +40,8 @@ def get_long_description():
 
 
 setup(
-    author='Peyman Mortazavi',
-    author_email='pey.mortazavi@gmail.com',
+    author='Infoscout',
+    author_email='infoscout@gmail.com',
     name='garlicconfig',
     packages=find_packages(),
     include_package_data=True,
