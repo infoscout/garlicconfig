@@ -32,7 +32,7 @@ aliases:
         steps:
             - checkout
               #- restore_cache: *restore_cache
-            - run: 
+            - run:
                 name: 'install system packages'
                 command: |
                   sudo apt-get update
@@ -106,7 +106,7 @@ jobs:
         steps:
             - checkout
             - restore_cache: *restore_cache
-            - run: 
+            - run:
                 name: 'install system packages'
                 command: |
                   yum -y install gcc patchelf python3 python3-pip python3-devel
@@ -117,6 +117,28 @@ jobs:
             - run:
                 name: 'Build Wheel Packages'
                 command: ./.circleci/dist-linux.sh
+            - run:
+                name: 'Twine :: Upload to PyPI'
+                command: |
+                    twine upload wheelhouse/*
+
+    dist-linux-arm:
+        docker:
+          - image: quay.io/pypa/manylinux2014_aarch64
+        steps:
+            - checkout
+            - restore_cache: *restore_cache
+            - run:
+                name: 'install system packages'
+                command: |
+                  yum -y install gcc patchelf python3 python3-pip python3-devel
+                  pip3 install --upgrade pip
+                  pip3 install wheel auditwheel cget cython twine
+            - run: *install_dependencies
+            - save_cache: *save_cache
+            - run:
+                name: 'Build Wheel Packages'
+                command: ./.circleci/dist-linux-arm.sh
             - run:
                 name: 'Twine :: Upload to PyPI'
                 command: |
@@ -308,6 +330,12 @@ workflows:
             - test-mac-py36
             - test-mac-py37
             - dist-linux:
+                filters:
+                  tags:
+                    only: /^[0-9]*[.][0-9]*[.][0-9]*$/
+                  branches:
+                    ignore: /.*/
+            - dist-linux-arm:
                 filters:
                   tags:
                     only: /^[0-9]*[.][0-9]*[.][0-9]*$/
