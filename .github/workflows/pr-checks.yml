@@ -25,7 +25,7 @@ jobs:
           flake8 garlicconfig
 
   test-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.9']
@@ -92,6 +92,7 @@ jobs:
           rm -rf build dist
           source venv/bin/activate
           export CURRENT_DIR=$(pwd)
+          export CGET_PATH=$CURRENT_DIR/cget
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_DIR/cget/lib:$CURRENT_DIR/cget/lib64
           python setup.py install
           cd tests
