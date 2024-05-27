@@ -54,6 +54,7 @@ jobs:
       - name: Upload to Coveralls
         run: |
           pip install coveralls
+          cd tests
           coveralls
 
 
@@ -99,4 +100,5 @@ jobs:
         run: |
           source venv/bin/activate
           pip install coveralls
+          cd tests
           coveralls
