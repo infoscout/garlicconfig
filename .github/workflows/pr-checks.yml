@@ -49,8 +49,9 @@ jobs:
           export CURRENT_DIR=$(pwd)
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_DIR/cget/lib:$CURRENT_DIR/cget/lib64
           python setup.py install
+          pip install coveralls
           cd tests
-          python tests.py
+          coverage run --source=garlicconfig tests.py
       - name: Upload to Coveralls
         run: |
           pip install coveralls
@@ -94,11 +95,11 @@ jobs:
           export CGET_PATH=$CURRENT_DIR/cget
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_DIR/cget/lib:$CURRENT_DIR/cget/lib64
           python setup.py install
+          pip install coveralls
           cd tests
-          python tests.py
+          coverage run --source=garlicconfig tests.py
       - name: Upload to Coveralls
         run: |
           source venv/bin/activate
-          pip install coveralls
           cd tests
           coveralls
